@@ -1,0 +1,17 @@
+<html>
+  <head>
+    <title>Testing Page</title>
+    <script>window.TEMPLATE_PARAMS = {{{js_params}}};</script>
+    {{#js_deps}}
+    <script type="text/javascript" src="{{js_path}}"></script>
+    {{/js_deps}}
+    <link rel="stylesheet" href="/css/select_testing.css">
+  </head>
+
+  <body>
+    <div>
+      <a href="/testing/{{game_type}}">Fresh game</a>
+    </div>
+    <div id="choices-container"></div>
+  </body>
+</html>

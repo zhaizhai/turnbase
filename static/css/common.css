@@ -1,0 +1,50 @@
+body {
+   font-family: Helvetica, Arial;
+}
+
+.standard-button {
+    border-radius: 2px;
+    border: solid 1px;
+    border-color: #888888;
+    background-color: #DDDDDD;
+}
+.standard-button:hover {
+    border-color: black;
+    background-color: #BBBBBB;
+}
+.standard-select {
+    border-radius: 2px;
+    border-color: #888888;
+    background-color: #DDDDDD;
+}
+.standard-select:hover {
+    border-radius: 2px;
+    border-color: black;
+    background-color: #DDDDDD;
+}
+.region-header {
+    font-size: 12pt;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background-color: #FFC995;
+}
+
+.standard-table-container {
+    display: table;
+    table-layout: fixed;
+}
+.standard-table-row {
+    display: table-row;
+}
+.standard-table-cell {
+    display: table-cell;
+}
+
+/* chat element */
+.chat-region {
+    font-size: 12px;
+    overflow-y: scroll;
+    word-wrap: break-word;
+}

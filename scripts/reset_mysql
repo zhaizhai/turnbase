@@ -1,0 +1,6 @@
+#!/bin/bash
+
+mysql <<EOF
+DROP DATABASE IF EXISTS turnbase;
+CREATE DATABASE turnbase;
+EOF

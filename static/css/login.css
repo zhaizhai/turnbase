@@ -1,0 +1,84 @@
+/* TODO: consider putting in common.css? */
+div.table-div {
+    display: table;
+}
+div.tc-div {
+    display: table-cell;
+}
+div.tr-div {
+    display: table-row;
+}
+
+/* temporary */
+.temporary-warning {
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+    font-family: Helvetica, Arial;
+    font-size: 13pt;
+    width: 400px;
+
+    border: solid black 1px;
+    padding: 5px;
+    padding-left: 20px;
+    margin-bottom: 10px;
+}
+
+/* container */
+.login-container {
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+
+    width: 330px;
+    background-color: #FFC995;
+    border-radius: 4px;
+    padding: 5px;
+}
+.login-header {
+    display: table-row;
+}
+.current-widget {
+    display: table-cell;
+    font-family: Helvetica, Arial;
+    font-size: 15pt;
+}
+.switch-widget {
+    display: table-cell;
+    width: 60px;
+
+    text-align: right;
+    white-space: nowrap;
+    padding-right: 5px;
+    text-decoration: none;
+}
+.switch-widget:hover {
+    color: #666666;
+}
+.login-widget {
+    margin-top: 16px;
+    width: 270px;
+}
+
+/* shared */
+.status-area {
+    display: table-cell;
+    color: red;
+}
+
+/* login widget */
+.login-input {
+    display: table-cell;
+}
+
+/* signup widget */
+.signup-input {
+    display: table-cell;
+    margin-left: 3px;
+}
+.first-name-input {
+    width: 100px;
+}
+.last-name-input {
+    width: 100px;
+}

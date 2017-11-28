@@ -1,0 +1,41 @@
+body {
+    background-color: #DDDDDD;
+}
+#game-container {
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+}
+#game-region {
+    display: table-cell;
+}
+#right-column {
+    display:table-cell;
+    vertical-align: top;
+}
+
+/* players box */
+.players-list {
+    padding: 4px;
+    background-color: white;
+}
+.request-bot-button {
+    /* TODO: hard-coded; don't know how to avoid */
+    margin-left: 100px;
+}
+
+/* chat box */
+.chat-container {
+    display: table-cell;
+    /* position: absolute; */
+    top: 0px;
+}
+.chat-region {
+    height: 400px;
+    width: 250px;
+    background-color: white;
+}
+.chat-input {
+    width: 250px;
+}

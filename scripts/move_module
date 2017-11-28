@@ -1,0 +1,20 @@
+#!/bin/bash
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR=$SCRIPT_DIR/..
+
+usage () {
+    echo "Usage: move_module [old_name] [new_name]"
+}
+
+if [ "$#" -ne 2 ]; then
+    usage
+    exit 1
+fi
+
+set -e
+# TODO: can I do this in a streaming fashion?
+module_candidates=`ack $1 $ROOT_DIR -l --ignore-dir $ROOT_DIR/node_modules`
+for file_name in $module_candidates; do
+    python $SCRIPT_DIR/replace_module.py $file_name $1 $2
+done

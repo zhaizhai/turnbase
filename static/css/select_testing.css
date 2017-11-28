@@ -1,0 +1,21 @@
+.choice-container {
+    display: table;
+    /* position: absolute; */
+    border-style: solid;
+    margin: 5px;
+    width: 300px;
+}
+
+.pick-test {
+    display: table-cell;
+    left: 0px;
+    padding-left: 4px;
+}
+
+/* Argh, can't figure out how to right align this within .choice-container */
+.delete-test {
+    display: table-cell;
+    margin-left: auto;
+    margin-right: 0px;
+    padding-right: 4px;
+}

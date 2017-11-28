@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <title>{{game_name}}</title>
+    <script>window.TEMPLATE_PARAMS = {{{js_params}}};</script>
+    {{#js_deps}}
+    <script type="text/javascript" src="{{js_path}}"></script>
+    {{/js_deps}}
+
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/game_harness.css">
+    <link rel="stylesheet" href="/css/game_skin.css">
+    <link rel="stylesheet" href="/nav_bar.css">
+
+    {{#css_deps}}
+    <link rel="stylesheet" href="{{css_path}}">
+    {{/css_deps}}
+
+    <script type="text/javascript">
+      window.NavBar('home', 'leave', 'rules');
+    </script>
+  </head>
+
+  <body>
+    <div id="game-container">
+      <div id="game-region"></div>
+      <div id="right-column"></div>
+    </div>
+  </body>
+</html>

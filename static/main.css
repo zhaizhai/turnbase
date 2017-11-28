@@ -1,0 +1,102 @@
+body {
+    background-color: #DDDDDD;
+}
+
+.home-container {
+    margin-left: auto;
+    margin-right: auto;
+    display: table;
+    align: center;
+}
+.top-left-panel {
+    display: table-cell;
+    width: 250px;
+    vertical-align: top;
+}
+#select-game-region, #create-table-region, #table-list, .chat-area {
+    border-radius: 5px;
+    border: solid 1px #CCCCCC;
+    margin: 10px;
+    background-color: #FFFFFF;
+}
+
+.top-center-panel {
+    display: table-cell;
+    width: 500px;
+    vertical-align: top;
+}
+.top-right-panel {
+    display: table-cell;
+    width: 250px;
+    vertical-align: top;
+    height: 100%;
+}
+
+span.vertical-align {
+}
+.game-block {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+
+    border-radius: 5px;
+    border: solid 1px;
+    width: 100px;
+    height: 100px;
+
+    margin: 10px;
+}
+.game-block-selected {
+    background-color: #FF9999;
+    margin: 10px;
+    font-weight: bold;
+}
+
+.create-table-header {
+}
+#create-table-region {
+}
+.game-options {
+    margin-bottom: 5px;
+}
+
+#table-list {
+    min-height: 500px;
+}
+
+.table-display {
+    margin: 3px;
+    border: solid 1px;
+    border-radius: 3px;
+    border-color: #AAAAAA;
+    background-color: #FFC995;
+}
+.no-tables {
+    padding: 5px;
+    text-align: center;
+}
+
+.chat-header {
+}
+
+.user-list {
+    padding: 5px;
+    background-color: #FFFFFF;
+    margin: 3px;
+    height: 150px;
+    overflow-y: scroll;
+}
+.chat-area {
+    background-color: #FFFFFF;
+    margin-left: 10px;
+    height: 100%;
+}
+/* chat element */
+.chat-region {
+    height: 300px;
+    width: 280px;
+}
+.chat-input {
+    width: 100%;
+}

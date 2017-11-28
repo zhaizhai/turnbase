@@ -1,0 +1,89 @@
+.spec-mode-name {
+    font-weight: bold;
+    font-family: Helvetica, Arial;
+    font-size: 20px;
+    color: blue;
+    padding-bottom: 20px;
+}
+.spec-mode-info, .spec-state-info, .spec-action-display {
+    border-style: solid;
+    border-radius: 3px;
+    border-width: 2px;
+    border-color: blue;
+    margin: 5px;
+    padding: 3px;
+}
+div.spec-action-name {
+    font-weight: bold;
+    font-size: 18px;
+    color: blue;
+}
+div.spec-action-input-area {
+    width: 300px;
+}
+input.spec-action-input {
+    width: 80px;
+}
+
+
+.test-info {
+    display: table-cell;
+    width: 600px;
+}
+.test-controls {
+    display: table-cell;
+    padding-left: 10px;
+}
+
+
+div.spec-container {
+    background-color: #EEEEEE;
+    border: 1px solid #BBBBBB;
+    border-radius: 3px;
+    padding: 2px;
+    margin: 5px;
+}
+
+div.spec-table-container {
+    overflow-y: auto;
+    padding-right: 10px;
+    max-height: 200px;
+}
+div.spec-array-dropdown {
+    display: block;
+    /*line-height: 0px;
+    height: 0px;*/
+    width: 10px;
+    /*
+    position: relative;
+    top: -2px;
+    border-top: solid 8px black;
+    border-left: solid 5px transparent;
+    border-right: solid 5px transparent;
+    vertical-align: middle;
+    */
+    padding-right: 5px;
+}
+table.spec-array-table {
+    border-collapse: collapse;
+}
+td {
+    border: solid 1px black;
+}
+
+
+.spec-struct-key {
+    display: table-cell;
+    font-weight: bold;
+    min-width: 100px;
+    padding-right: 20px;
+    padding-left: 15px;
+}
+.spec-struct-value {
+    display: table-cell;
+}
+
+
+.spec-header-text {
+    font-weight: bold;
+}

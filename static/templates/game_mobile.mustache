@@ -1,0 +1,29 @@
+<html>
+  <head>
+    <title>{{game_name}}</title>
+    <script>
+      window.TEMPLATE_PARAMS = {{{js_params}}};
+      window.onerror = function(e) {
+        alert(e);
+      };
+    </script>
+    {{#js_deps}}
+    <script type="text/javascript" src="{{js_path}}"></script>
+    {{/js_deps}}
+
+    <meta name = "viewport" content = "user-scalable=no, width=400">
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" type="text/css">
+
+    <link rel="stylesheet" href="/css/common.css">
+    {{#css_deps}}
+    <link rel="stylesheet" href="{{css_path}}">
+    {{/css_deps}}
+  </head>
+
+  <body>
+    <div id="game-container">
+      <div id="game-region"></div>
+      <div id="right-column"></div>
+    </div>
+  </body>
+</html>
