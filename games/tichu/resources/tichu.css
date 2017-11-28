@@ -1,0 +1,11 @@
+table.scoreboard {
+    display: table-cell;
+    text-align: center;
+    width: 100%;
+    /* position: absolute; */
+
+    border-collapse: collapse;
+}
+
+
+
