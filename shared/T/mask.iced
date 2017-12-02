@@ -77,15 +77,16 @@ T.MaskedStruct = (type_spec) ->
   MType.prototype.add_access = (x) ->
     unless x in @_access
       @_access.push x
+    return @
 
   # TODO: MType.type = ?
-  #MType._access = []
   return MType
 
 
 T.MString = T.MaskedString = T.MaskedStruct (struct 'StringContainer', {
   s: _T.String
   get: -> @s
+  set: (@s) ->
 }, {
   loaders: [
     (s) ->
@@ -98,6 +99,7 @@ T.MString = T.MaskedString = T.MaskedStruct (struct 'StringContainer', {
 T.MInteger = T.MaskedInteger = T.MaskedStruct (struct 'IntegerContainer', {
   n: _T.Integer
   get: -> @n
+  set: (@n) ->
 }, {
   loaders: [
     (n) ->
@@ -110,6 +112,7 @@ T.MInteger = T.MaskedInteger = T.MaskedStruct (struct 'IntegerContainer', {
 T.MNumber = T.MaskedNumber = T.MaskedStruct (struct 'NumberContainer', {
   n: _T.Number
   get: -> @n
+  set: (@n) ->
 }, {
   loaders: [
     (n) ->
@@ -122,6 +125,7 @@ T.MNumber = T.MaskedNumber = T.MaskedStruct (struct 'NumberContainer', {
 T.MBoolean = T.MaskedBoolean = T.MaskedStruct (struct 'BooleanContainer', {
   b: _T.Boolean
   get: -> @b
+  set: (@b) ->
 }, {
   loaders: [
     (b) ->
@@ -132,6 +136,7 @@ T.MBoolean = T.MaskedBoolean = T.MaskedStruct (struct 'BooleanContainer', {
 })
 
 T.Masked = (type_spec) ->
+  # TODO: does this work for Nullable primitives?
   switch type_spec.type
     when 'string'
       return T.MaskedString

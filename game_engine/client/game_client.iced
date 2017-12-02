@@ -3,6 +3,7 @@ assert = require 'assert'
 util_m = require 'shared/util.iced'
 
 {T} = require 'shared/T/T.iced'
+{V} = require 'shared/T/validation.iced'
 {$ajax} = require 'client/lib/http_util.iced'
 
 
@@ -109,7 +110,7 @@ class GameClient extends EventEmitter
     state = @gsc.state()
     tmp = state.PLAYER
     state.PLAYER = @player_id
-    result = validate.apply state, []
+    result = (V.catch_asserts validate).apply state, []
     state.PLAYER = tmp
     # TODO: also report reason
     return result.outcome

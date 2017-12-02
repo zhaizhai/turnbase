@@ -4,6 +4,10 @@ util_m = require 'shared/util.iced'
 {T, struct} = require 'shared/T/T.iced'
 {V} = require 'shared/T/validation.iced'
 
+exports.T = T
+exports.V = V
+exports.struct = struct
+
 exports.option = (tmpl, params) ->
   ret = []
   s = tmpl

@@ -9,7 +9,7 @@ is_struct = (x) ->
 
 class StructError extends Error
   constructor: (message, @top, @path = []) ->
-    super 'abcd'
+    super ''
     Object.defineProperty @, "name", {
       value: @constructor.name
     }
@@ -22,6 +22,10 @@ class StructError extends Error
     if @path.length > 0
       mesg += "\nPath: #{@path}\n\n"
     mesg += "#{@base_message}"
+    # TODO: Modifying the error message doesn't work anymore (I think
+    # because of ES5 -> ES6 changes?). We should probably just rewrite
+    # StructError in JS so we don't have to fight the iced compiler,
+    # now that JS has classes.
     Object.defineProperty @, "message", {value: mesg}
 
   prepend_path: (component) ->

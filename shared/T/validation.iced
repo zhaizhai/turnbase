@@ -3,8 +3,8 @@ mustache_m = require 'mustache'
 {T} = require 'shared/T/T.iced'
 
 V = {}
-V.r = r = (outcome, reason = null) ->
-  return {outcome, reason}
+V.r = r = (is_valid, reason = null) ->
+  return {outcome: is_valid, reason}
 
 
 V.Validation = (struct_spec, validations) ->
@@ -122,6 +122,23 @@ V.check = (check_list) ->
       if not bool
         return V.r false, reason
   return V.r true
+
+
+V._verr = {}
+V.catch_asserts = (fn) ->
+  return ->
+    try
+      fn.call(@)
+    catch e
+      if e isnt V._verr
+        throw e
+      return V.r false, e.mesg
+    return V.r true
+V.assert = (assertion, mesg) ->
+  if not assertion
+    V._verr.mesg = mesg
+    throw V._verr
+
 
 V.validate_request = (request, pattern, coerce_string = false) ->
   # TODO: this is a bit hacky, maybe we should just return args

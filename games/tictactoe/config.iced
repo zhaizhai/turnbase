@@ -1,5 +1,5 @@
 exports.CONFIGS =
-  #disabled: true
+  disabled: false
   display_name: 'Tic Tac Toe'
   js_deps: ['&jquery']
   css_deps: []

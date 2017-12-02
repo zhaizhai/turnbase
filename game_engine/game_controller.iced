@@ -219,7 +219,7 @@ class GameController
       catch e
         return V.r false, "Argument #{i} is invalid: #{e.message}"
 
-    res = @execute_block player_id, [], validate
+    res = @execute_block player_id, [], (V.catch_asserts validate)
     if not res.outcome
       return make_result null, res.reason
 
