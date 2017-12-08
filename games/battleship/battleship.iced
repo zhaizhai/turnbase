@@ -49,7 +49,6 @@ Player = Turnbase.struct 'Player', {
   # functions in C++. This one returns whether the given ship can be
   # placed at (x, y).
   can_place: (ship_num, x, y, is_vertical) ->
-    console.log 'num ships', @ships.length
     ship = @ships[ship_num]
     to_place = if is_vertical
       ([x, y + k] for k in [0...ship.length])
@@ -62,7 +61,8 @@ Player = Turnbase.struct 'Player', {
       # need to test placements for your own ships.
       if not @placements.in_range(x2, y2)
         return false
-      if @placements.get(x2, y2) is ship_num
+      cur = @placements.get(x2, y2)
+      if cur? and cur isnt ship_num
         return false
     return true
 

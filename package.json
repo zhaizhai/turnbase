@@ -1,24 +1,25 @@
 {
-    "name": "turnbase",
-    "version": "1.0.0",
-    "description": "A framework for implementing online multi-player turn-based games.",
-    "scripts": {
-        "start": "games_start"
-    },
-    "dependencies": {
-        "browserify": "^13.1.0",
-        "mysql": "^2.0.0",
-        "nodemon": "^1.12.x",
-        "iced-coffee-script": "^108.0.11",
-        "seed-random": "^2.2.0",
-        "mustache": "^2.3.x",
-
-        "express": "^4.16.x",
-        "cookie-parser": "^1.4.x",
-        "body-parser": "^1.18.x",
-        "serve-static": "^1.13.x",
-        "express-session": "^1.15.x"
-    },
-    "devDependencies": {
-    }
+  "name": "turnbase",
+  "version": "1.0.0",
+  "description": "A framework for implementing online multi-player turn-based games.",
+  "scripts": {
+    "start": "games_start",
+    "test": "run_tests.iced"
+  },
+  "dependencies": {
+    "browserify": "^13.1.0",
+    "mysql": "^2.0.0",
+    "nodemon": "^1.12.x",
+    "iced-coffee-script": "^108.0.11",
+    "seed-random": "^2.2.0",
+    "mustache": "^2.3.x",
+    "express": "^4.16.x",
+    "cookie-parser": "^1.4.x",
+    "body-parser": "^1.18.x",
+    "serve-static": "^1.13.x",
+    "express-session": "^1.15.x"
+  },
+  "devDependencies": {
+    "jasmine": "^2.8.0"
+  }
 }

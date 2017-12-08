@@ -1,3 +1,4 @@
+log = require('shared/log.iced') 'game_client.iced'
 {EventEmitter} = require 'events'
 assert = require 'assert'
 util_m = require 'shared/util.iced'
@@ -17,13 +18,13 @@ class GameStateClient
   mode: -> @_mode
 
   init: (mode_name, json) ->
-    console.log 'Initializing GameStateClient in mode', mode_name
+    log.info 'Initializing GameStateClient in mode', mode_name
     @_game_over = false
     @_mode = @game_spec.modes[mode_name]
     @_state = @_mode.struct.load_json json
 
   process_op: (op_data) ->
-    console.log 'Client processing op:', op_data
+    log.info 'Client processing op:', op_data
     {op, snapshot} = op_data
     if op in ['ENTER_MODE', 'LEAVE_MODE']
       @_mode = @game_spec.modes[op_data.mode_name]
@@ -67,7 +68,7 @@ class GameClient extends EventEmitter
     @game_id = @table_info.game_id()
     assert @game_id?, "Missing game id!"
 
-    console.log 'spec is', @game_spec
+    log.info 'spec is', @game_spec
     @gsc = new GameStateClient @game_spec, @tid, @player_id
 
     @_mode_handlers = {}
@@ -83,12 +84,12 @@ class GameClient extends EventEmitter
     }, (@_process_op.bind @), defer err,
       {game_over, snapshot}
     return cb err if err
-    console.log 'snapshot', snapshot
+    log.info 'initial snapshot', snapshot
 
     @gsc.init snapshot.mode_name, snapshot.json
     @_set_mode_handlers mode_handlers
     @_transition @gsc.mode().name
-    console.log 'running GameClient with handlers', @_mode_handlers
+    log.info 'running GameClient with handlers', @_mode_handlers
     return cb null
 
   state: -> @gsc.state()
@@ -137,7 +138,7 @@ class GameClient extends EventEmitter
     for k in mode_names
       handler = handler_map[k]
       if not handler?
-        console.warn "Using default handler for unhandled mode #{k}"
+        log.warn "Using default handler for unhandled mode #{k}"
       handler ?=
         init: ->
         action: ->
@@ -179,7 +180,7 @@ class GameClient extends EventEmitter
     @_cur_handler.init.apply @_cur_handler, []
 
   _game_over_cleanup: ->
-    console.log 'game is over: running GameClient cleanup'
+    log.info 'Game is over: running GameClient cleanup'
     @op_stream.stop()
     # TODO: maybe remove for all events
     @removeAllListeners 'users-changed'
