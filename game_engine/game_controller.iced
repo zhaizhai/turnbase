@@ -206,7 +206,7 @@ class GameController
     cur_mode = @gs.mode()
     action = cur_mode.actions[action_name]
     if not action?
-      return make_result null, "Invalid action #{action_name}"
+      return make_result null, "Invalid action #{action_name} in mode #{cur_mode.name}"
 
     {types, validate, execute} = action args...
 

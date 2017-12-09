@@ -1,10 +1,10 @@
 log = (require 'shared/log.iced') 'test_game.iced'
 assert = require 'assert'
 synchro_m = require 'shared/synchro.iced'
+{LinearDataProvider} = require 'server/poll_server.iced'
 {GameSpec} = require 'game_engine/game_spec.iced'
 {GameClient} = require 'game_engine/client/game_client.iced'
-{LinearDataProvider} = require 'server/poll_server.iced'
-
+{StatePrinter} = require 'game_engine/testing/state_printer.iced'
 
 # An OpStream that simulates longpolling the server.
 class DirectOpStream
@@ -40,6 +40,7 @@ class GameTester
       on: ->
       game_id: -> 'g0'
       username_for_player: ->
+      compile_log_mesg: -> ""
     }
 
   constructor: (@spec, initial_data = {}) ->
@@ -94,6 +95,9 @@ class GameTester
       if err?
         GameClient.RPC = old_RPC
         throw err
+      # help prevent stack overflows and unexpected async behavior
+      # (real clients would necessarily have a pause here anyway)
+      await process.nextTick defer()
 
     GameClient.RPC = old_RPC
     return cb()
@@ -101,9 +105,9 @@ class GameTester
   mode_name: -> @_gc.gs.mode().name
   server_state: -> @_gc.gs.state()
 
-  dump_state: ->
-    mode_struct = @_gc.gs.mode().struct
-    return JSON.stringify(mode_struct.dump_json @_gc.gs.state())
+  print_state: ->
+    state_str = StatePrinter.print @server_state()
+    log.debug "In mode #{@spec.name}.#{@mode_name()}:", state_str
 
   _create_client: (player_id) ->
     op_stream = new DirectOpStream player_id, @_gc, @_provider
@@ -112,3 +116,14 @@ class GameTester
 
 
 exports.GameTester = GameTester
+exports.define_states = (states) ->
+  expand_state = (state_name) ->
+    actions = states[state_name].slice()
+    initial = actions[0]
+    if typeof initial is 'string'
+      actions.splice 0, 1, expand_state(initial)...
+    return actions
+
+  for k, v of states
+    states[k] = expand_state(k)
+  return states

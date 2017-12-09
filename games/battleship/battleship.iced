@@ -255,7 +255,7 @@ Turnbase.main ->
 
     other = (cur_turn + 1) % 2
     # Check whether the other player has lost.
-    if util_m.all ((ship.health == 0) for ship in @players[other].ships)
+    if util_m.all ((ship.health.get() == 0) for ship in @players[other].ships)
       @LOG "%{#{other}} has no ships left. %{#{cur_turn}} wins!"
       break
 
