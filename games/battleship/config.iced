@@ -1,4 +1,6 @@
-# This is a configuration file . It is
+# Each game must have a configuration file in its directory named
+# `config.iced`. It is automatically detected and describes basic info
+# about the game.
 
 exports.CONFIGS =
   # (Default: false) Whether or not the game is disabled. This is
@@ -20,3 +22,5 @@ exports.CONFIGS =
   #client: 'ui.iced'
   # (Required) The default number of players for the game.
   default_num_players: 2
+
+# TODO: implement a non-default UI for battleship

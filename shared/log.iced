@@ -27,7 +27,10 @@ class Logger
     @[name] = (mesgs...) =>
       if not LEVEL_FLAGS[name]
         return
-      prefix = BRIGHT + COLORS[color] + "#{disp_text} (#{@filename}):" + "\x1b[0m"
+      prefix = if window? # colors don't work in browser
+        "#{disp_text} (#{@filename}):"
+      else
+        BRIGHT + COLORS[color] + "#{disp_text} (#{@filename}):" + "\x1b[0m"
       logger.call null, prefix, mesgs...
 
   set_flag: (flag, value) ->

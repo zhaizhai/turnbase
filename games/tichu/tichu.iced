@@ -39,8 +39,6 @@ Trick = struct 'Trick', {
 }
 
 
-
-
 Turnbase.state {
   players: (T.ArrayOf Player)
   undealt_cards: (T.ArrayOf MCard)
@@ -266,40 +264,35 @@ Turnbase.mode 'Play', {
       (T.Nullable T.Integer)
       (T.Nullable T.Integer)
     ]
-    validate: -> V.check [
-        # TODO: check that mahjong was played if wishing
-        [(wish is null) or (wish in [2..14]), "Invalid mahjong wish!"]
-        =>
-          hand = @players[@PLAYER].cards
-          played = ((util_m.clone hand[idx]) for idx in to_play)
-          for c in played
-            continue unless c.suit is 'phoenix'
-            if not phoenix_value?
-              return V.r false, "Must specify phoenix value"
-            c.value = phoenix_value
+    validate: ->
+      # TODO: check that mahjong was played if wishing
+      V.assert ((wish is null) or (wish in [2..14])), "Invalid mahjong wish!"
 
-          played_bomb = logic.is_bomb played
-          unless played_bomb or @PLAYER is @cur_turn
-            return V.r false, "Out of turn!"
-          last = util_m.last @cur_trick.cards
-          # this also handles the case where last is null
-          if not (logic.is_playable_over played, last)
-            return V.r false, "Not playable!"
-          # check mahjong wish
-          # you can bomb "before" your turn (or on someone else's) to avoid wish
-          if played_bomb
-            return V.r true
-          # no wish?
-          unless @mahjong_wish?
-            return V.r true
-          csmw = logic.can_satisfy_mahjong_wish
-          unless csmw last, hand, @mahjong_wish
-            return V.r true
-          dsmw = logic.does_satisfy_mahjong_wish
-          if dsmw played, @mahjong_wish
-            return V.r true
-          return V.r false, "Must satisfy wish!"
-      ]
+      hand = @players[@PLAYER].cards
+      played = ((util_m.clone hand[idx]) for idx in to_play)
+      for c in played
+        continue unless c.suit is 'phoenix'
+        V.assert phoenix_value?, "Must specify phoenix value"
+        c.value = phoenix_value
+
+      played_bomb = logic.is_bomb played
+      V.assert (played_bomb or @PLAYER is @cur_turn), "Out of turn!"
+
+      last = util_m.last @cur_trick.cards
+      # this also handles the case where last is null
+      V.assert (logic.is_playable_over played, last), "Not playable!"
+      # check mahjong wish
+      # you can bomb "before" your turn (or on someone else's) to avoid wish
+      if played_bomb or not @mahjong_wish?
+        return
+
+      # deal with mahjong wish
+      csmw = logic.can_satisfy_mahjong_wish
+      if not (csmw last, hand, @mahjong_wish)
+        return
+      dsmw = logic.does_satisfy_mahjong_wish
+      V.assert (dsmw played, @mahjong_wish), "Must satisfy wish!"
+
     execute: ->
       hand = @players[@PLAYER].cards
       new_hand = []
@@ -354,17 +347,15 @@ Turnbase.mode 'Play', {
 
   pass: ->
     types: []
-    validate: -> V.check [
-        [@PLAYER is @cur_turn, "Out of turn! (cur turn: #{@cur_turn})"]
-        [@last_player?, "You have the lead, must play"]
-        =>
-          return (V.r true) if not @mahjong_wish?
-          csmw = logic.can_satisfy_mahjong_wish
-          cards = @players[@PLAYER].cards
-          if (csmw @cur_trick.last_play(), cards, @mahjong_wish)
-            return V.r false, "You must satisfy wish!"
-          return V.r true
-      ]
+    validate: ->
+      V.assert (@PLAYER is @cur_turn), "Out of turn! (cur turn: #{@cur_turn})"
+      V.assert @last_player?, "You have the lead, must play"
+      if not @mahjong_wish?
+        return
+
+      csmw = logic.can_satisfy_mahjong_wish
+      cards = @players[@PLAYER].cards
+      V.assert (not (csmw @cur_trick.last_play(), cards, @mahjong_wish)), "You must satisfy wish!"
     execute: ->
       @LOG "%{#{@PLAYER}} passed."
       @cur_turn = (@cur_turn + 1) % 4
@@ -374,9 +365,8 @@ Turnbase.mode 'Play', {
 
   tichu: ->
     types: []
-    validate: -> V.check [
-      [@players[@PLAYER].tichu_level == logic.CAN_TICHU, "can't tichu!"]
-    ]
+    validate: ->
+      V.assert (@players[@PLAYER].tichu_level == logic.CAN_TICHU), "can't tichu!"
     execute: ->
       @players[@PLAYER].tichu_level = logic.TICHU
       @LOG "%{#{@PLAYER}} calls Tichu!"
@@ -387,9 +377,8 @@ Turnbase.mode 'Pass', {
 
   tichu: ->
     types: []
-    validate: -> V.check [
-      [@players[@PLAYER].tichu_level == logic.CAN_TICHU, "can't tichu!"]
-      ]
+    validate: ->
+      V.assert (@players[@PLAYER].tichu_level == logic.CAN_TICHU), "can't tichu!"
     execute: ->
       @players[@PLAYER].tichu_level = logic.TICHU
       # unpass all the cards
@@ -399,13 +388,14 @@ Turnbase.mode 'Pass', {
 
   pass: (cards) ->
     types: [(T.ArrayOf T.Integer)]
-    validate: -> V.check [
-      [not @to_pass[@PLAYER]?, "Already passed"]
-      [cards.length is 3, "Must pass 3 cards"]
+    validate: ->
+      V.assert (not @to_pass[@PLAYER]?), "Already passed"
+      V.assert (cards.length is 3), "Must pass 3 cards"
       # TODO: hard-coded 14 as the hand size
-      [(util_m.all (0 <= idx and idx < 14 for idx in cards)), "Invalid pass!"]
-      => ((V.distinct V.Number) cards)
-      ]
+      V.assert (util_m.all (0 <= idx and idx < 14 for idx in cards)), "Invalid pass!"
+      are_distinct = ((V.distinct V.Number) cards).outcome
+      V.assert are_distinct, "Cards to pass are not distinct!"
+
     execute: ->
       @to_pass[@PLAYER] = []
       for n in cards
@@ -449,10 +439,9 @@ Turnbase.mode 'PickDragon', {
   dragon_picker: T.Integer
   pick: (offset) ->
     types: [T.Integer]
-    validate: -> V.check [
-      [@PLAYER == @dragon_picker, "not your dragon pick!"]
-      [offset is 1 or offset is 3, "invalid dragon pick!"]
-    ]
+    validate: ->
+      V.assert (@PLAYER == @dragon_picker), "not your dragon pick!"
+      V.assert (offset is 1 or offset is 3), "invalid dragon pick!"
     execute: ->
       recipient = (@dragon_picker + offset) % 4
       @LOG "%{#{@PLAYER}} gives dragon to %{#{recipient}}."
@@ -463,9 +452,8 @@ Turnbase.mode 'GrandTichu', {
   # TODO: make it so that action order doesn't affect next 6
   grand: ->
     types: []
-    validate: -> V.check [
-      [@players[@PLAYER].num_cards() == 8, "can't grand any more"]
-    ]
+    validate: ->
+      V.assert (@players[@PLAYER].num_cards() == 8), "can't grand any more"
     execute: ->
       @draw @PLAYER, 6
       player = @players[@PLAYER]
@@ -481,9 +469,8 @@ Turnbase.mode 'GrandTichu', {
 
   next_cards: ->
     types: []
-    validate: -> V.check [
-      [@players[@PLAYER].num_cards() == 8, "can't grand any more"]
-    ]
+    validate: ->
+      V.assert (@players[@PLAYER].num_cards() == 8), "can't grand any more"
     execute: ->
       @draw @PLAYER, 6
       player = @players[@PLAYER]

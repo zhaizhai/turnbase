@@ -262,5 +262,5 @@ Turnbase.main ->
     # It's now the other player's turn.
     cur_turn = other
 
-  # The special functiion @GAME_OVER() ends the game.
+  # The special function @GAME_OVER() ends the game.
   @GAME_OVER()

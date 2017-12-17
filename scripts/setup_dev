@@ -9,15 +9,6 @@ ROOT_DIR=$SCRIPT_DIR/..
 sudo apt-get install nodejs npm
 sudo apt-get install mysql-server mysql-client
 
-# NPM_GLOBAL="coffee-script iced-coffee-script nodemon"
-
-# for pkg in $NPM_GLOBAL; do
-#     # TODO: write a better script to avoid needlessly installing
-#     if [ ! -d "/usr/local/lib/node_modules/$pkg" ]; then
-# 	    sudo npm install -g $pkg
-#     fi
-# done
-
 if [ ! -e "/usr/bin/node" ]; then
     echo "Creating symlink node -> nodejs (used by iced-coffee-script)"
     sudo ln -s nodejs /usr/bin/node

@@ -65,7 +65,7 @@ TextBox = MixinClass 'TextBox', [CanvElement],
       ctx.fillText line, x, (@size * (idx * 1.2 + 1))
 
 
-# TODO: make better
+# TODO: clean up
 MultiStyleTextBox = MixinClass 'MultiStyleTextBox', [CanvElement],
   constructor: (opts) ->
     {@size, @num_rows} = opts

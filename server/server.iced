@@ -60,7 +60,9 @@ exports.setup_app = (args) ->
   app.use(middleware.session {
     secret: LOGIN_SECRET, resave: false
     # TODO: figure out if we need resave:true here (see https://www.npmjs.com/package/express-session)
-    saveUninitialized: false
+    saveUninitialized: true
+    # TODO: better understand if this is really the setting for
+    # saveUninitialized we want
   })
   # TODO: specify this for only a subset of routes by having a first
   # argument to app.use
