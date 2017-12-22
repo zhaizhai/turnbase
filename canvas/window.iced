@@ -23,7 +23,7 @@ InvisibleBox = MixinClass 'InvisibleBox', [CanvElement],
 
 DEFAULT_TEXT_BOX_OPTS = {
   size: 15, text_color: 'black',
-  font: 'Open Sans', align: 'left'
+  font: 'Roboto', align: 'left'
   style: ''
 }
 TextBox = MixinClass 'TextBox', [CanvElement],
@@ -75,7 +75,7 @@ MultiStyleTextBox = MixinClass 'MultiStyleTextBox', [CanvElement],
     @bg_color = 'white'
     @line_spacing = 3
     @part_spacing = 3
-    @default_font = 'Open Sans'
+    @default_font = 'Roboto'
     @default_text_color = 'black'
     @parts = null
     @width = opts.width ? 80
@@ -151,7 +151,7 @@ TextInfo = MixinClass 'TextInfo', [CanvElement],
     for k, v of @_info
       unless v? then continue
       text = "#{k}: #{v}"
-      ctx.font = @_text_size + 'pt Open Sans'
+      ctx.font = @_text_size + 'pt Roboto'
       ctx.fillStyle = 'black'
       ctx.textAlign = 'left'
       ctx.fillText text, 0, y
@@ -162,7 +162,7 @@ Button = MixinClass 'Button', [CanvElement],
     {@text, @size, @bg_color} = opts
     @size ?= 12
     @bg_color ?= '#DDDDDD'
-    @font = 'Open Sans'
+    @font = 'Roboto'
 
     @handler = opts.handler ? null
     @_onpress = opts.onpress ? null

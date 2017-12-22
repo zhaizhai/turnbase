@@ -96,6 +96,7 @@ class GameClient extends EventEmitter
   mode_name: -> @gsc.mode().name
   is_running: -> @op_stream.started
   num_players: -> @table_info.num_players()
+  player_id: -> @player_id
   username_for_player: (player_id, disambiguate = true) ->
     return @table_info.username_for_player player_id, disambiguate
 
@@ -123,6 +124,11 @@ class GameClient extends EventEmitter
     return cb null, res
 
   submit_action: (action_name, args, cb) ->
+    # TODO: make nicer default behavior in case of error (maybe show in chat)
+    cb ?= (err, res) =>
+      if err? then return alert err
+      # TODO: better error response format
+      if res isnt 'ok' then alert res
     action_data =
       action_name: action_name
       player_id: @player_id
@@ -143,6 +149,12 @@ class GameClient extends EventEmitter
         init: ->
         action: ->
         cleanup: ->
+
+      if handler.update?
+        bound_update = handler.update.bind handler
+        handler.init ?= bound_update
+        handler.action ?= bound_update
+
       @_mode_handlers[k] = handler
 
   _process_op: (op, cb) ->

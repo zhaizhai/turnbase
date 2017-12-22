@@ -17,7 +17,8 @@
     "cookie-parser": "^1.4.x",
     "body-parser": "^1.18.x",
     "serve-static": "^1.13.x",
-    "express-session": "^1.15.x"
+    "express-session": "^1.15.x",
+    "fontfaceobserver": "^2.0.13"
   },
   "devDependencies": {
     "jasmine": "^2.8.0"

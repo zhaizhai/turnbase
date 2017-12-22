@@ -62,7 +62,7 @@ Player = Turnbase.struct 'Player', {
       if not @placements.in_range(x2, y2)
         return false
       cur = @placements.get(x2, y2)
-      if cur? and cur isnt ship_num
+      if cur? and (cur isnt ship_num)
         return false
     return true
 
@@ -181,7 +181,7 @@ Turnbase.mode 'Place', {
         for cy in [0...grid.width]
           # remove previous placement of the ship
           if grid.get(cx, cy) is ship_num
-            grid.set(cx, cy, -1)
+            grid.set(cx, cy, null)
 
           # new placement of ship
           if is_vertical
@@ -262,5 +262,8 @@ Turnbase.main ->
     # It's now the other player's turn.
     cur_turn = other
 
+  # Reveal each player's ship placements to the other
+  @players[0].placements.add_access(1)
+  @players[1].placements.add_access(0)
   # The special function @GAME_OVER() ends the game.
   @GAME_OVER()
