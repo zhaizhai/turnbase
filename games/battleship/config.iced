@@ -19,7 +19,7 @@ exports.CONFIGS =
   # (Default: null) The file containing the code for the client UI. If
   # left empty, a default client will be created that displays the raw
   # game state. This is mainly useful for prototyping and testing.
-  #client: 'ui.iced'
+  client: 'ui.iced'
   # (Required) The default number of players for the game.
   default_num_players: 2
 

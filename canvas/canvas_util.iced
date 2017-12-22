@@ -109,7 +109,10 @@ class BufferedCanvas
     }
 
   click: (handler) ->
-    @_elt.click (e) =>
+    # disable context menu so as not to interfere with right clicks
+    @_elt.contextmenu (e) => false
+    # mouseup allows us to detect right clicks as well
+    @_elt.mouseup (e) =>
       e = standardize_evt e
       return handler e.x, e.y, {right: e.right}
 

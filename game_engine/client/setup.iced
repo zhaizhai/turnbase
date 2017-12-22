@@ -2,6 +2,7 @@ assert = require 'assert'
 {GameClient} = require 'game_engine/client/game_client.iced'
 {OpStream} = require 'game_engine/client/op_stream.iced'
 
+FontFaceObserver = require 'fontfaceobserver'
 {R} = require 'client/lib/R.iced'
 {$ajax} = require 'client/lib/http_util.iced'
 {LongPollClient} = require 'client/lib/poll_client.iced'
@@ -67,6 +68,12 @@ create_canvas = (params) ->
           break
   return canv
 
+load_fonts = (cb) ->
+  # TODO: load the font from our own server
+  font = new FontFaceObserver 'Roboto'
+  font.load().then cb, ->
+    console.error "Failed to load font Roboto."
+
 setup = (params) ->
   REQUIRED_PARAMS = [
     'game_spec', 'make_mode_handlers'
@@ -87,6 +94,7 @@ setup = (params) ->
   window.onload = ->
     {tid, player_id, game_type} = TEMPLATE_PARAMS
 
+    await load_fonts defer()
     await R.init params.resources, defer err
     if err then return params.onerror err
 
