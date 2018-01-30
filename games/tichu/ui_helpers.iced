@@ -10,7 +10,7 @@ tichu_helpers_m = require 'games/tichu/tichu_helpers.iced'
 {encode_val, decode_val} = tichu_helpers_m
 
 {TichuCardGraphics} = require 'games/tichu/tichu_card_graphics.iced'
-{CardHand, HiddenCardHand} = require 'canvas/cards/card_hand.iced'
+{CardHand, HiddenCardHand, CardArranger} = require 'canvas/cards/card_hand.iced'
 {PointsDisplay} = require 'games/tichu/points_display.iced'
 {OpponentHands} = require 'canvas/cards/four_player.iced'
 
@@ -165,37 +165,9 @@ class BottomDisplay
     @_elt = new HBox {spacing: 20}, [@_card_hand]
     @_elt.add @_ctrls if @_ctrls?
 
-  # set_hand: (hand) ->
-  #   @_card_hand.set_hand hand
-  #   for i in [0...hand.length]
-  #     @_card_hand.set_attr i, 'orig_index', i
-
   update_hand: (hand) ->
-    ch = @_card_hand
-    existing = []
-
-    hand_idx = 0
-    while hand_idx < ch.num_cards()
-      info = (ch.get_attrs hand_idx)
-      hashed = tichu_helpers_m.hash_card info.card
-
-      remains = false
-      for card, idx in hand
-        if (tichu_helpers_m.hash_card card) is hashed
-          remains = true
-          ch.set_attr hand_idx, 'orig_index', idx
-          existing.push idx
-          hand_idx++
-          break
-      if not remains
-        ch.remove hand_idx
-
-    for card, idx in hand
-      if idx in existing
-        continue
-      insert_idx = ch.num_cards()
-      ch.insert insert_idx, card
-      ch.set_attr insert_idx, 'orig_index', idx
+    CardArranger.update_hand @_card_hand, hand, (a, b) =>
+      return (tichu_helpers_m.hash_card a) == (tichu_helpers_m.hash_card b)
 
   elt: -> @_elt
 

@@ -142,11 +142,6 @@ CardHand = MixinClass 'CardHand', [CanvElement],
     if idx < 0 or idx >= @_card_info.length
       throw new Error "index #{idx} out of range!"
     [removed] = @_card_info.splice idx, 1
-    old_idx = removed.orig_index
-    # decrement all higher indices
-    for info in @_card_info
-      if info.orig_index > old_idx
-        info.orig_index -= 1
     @layout()
 
   move: (from, to) ->
@@ -184,6 +179,9 @@ CardHand = MixinClass 'CardHand', [CanvElement],
       @layout()
 
   set_all: (attr, val) ->
+    valid_attrs = DISPLAY_ATTRS.concat (k for k of @_attrs)
+    assert (attr in valid_attrs), "Invalid attribute #{attr}"
+
     for info in @_card_info
       info[attr] = val
     if attr in DISPLAY_ATTRS
@@ -251,12 +249,38 @@ CardHand = MixinClass 'CardHand', [CanvElement],
 
 
 class CardArranger
+  # Update the CardHand with a new hand while preserving the current
+  # ordering of cards. New cards are appended to the end.
+  @update_hand = (ch, new_hand, are_equal) ->
+    used_indices = new Set()
+
+    hand_idx = 0
+    while hand_idx < ch.num_cards()
+      attrs = (ch.get_attrs hand_idx)
+      remains = false
+      for card, idx in new_hand when not used_indices.has(idx)
+        if (are_equal card, attrs.card)
+          remains = true
+          ch.set_attr hand_idx, 'orig_index', idx
+          used_indices.add idx
+          hand_idx++
+          break
+      if not remains
+        ch.remove hand_idx
+
+    for card, idx in new_hand when not used_indices.has(idx)
+      insert_idx = ch.num_cards()
+      ch.insert insert_idx, card
+      ch.set_attr insert_idx, 'orig_index', idx
+
   constructor: (@card_hand, @opts) ->
     @opts.on_move ?= (old_idx, new_idx) ->
     @opts.toggle_on_click ?= false
     @_did_move = false
     @_old_raised = null
     @_dragging_idx = null
+
+    # TODO: assert that orig_index exists
 
     @_on_drag = {
       # TODO: there are probably race conditions here
@@ -285,11 +309,17 @@ class CardArranger
     @_dragging_idx = null
     @_did_move = false
 
+  get_selection: ->
+    selected = @card_hand.filter (info) ->
+      return info.raised
+    return selected
+
   activate: ->
     # TODO: allow multiple drag handlers
     @card_hand.drag @_on_drag
   deactivate: ->
     @card_hand.drag null
+
 
 
 class CardSelector

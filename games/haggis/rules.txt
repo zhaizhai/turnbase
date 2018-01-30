@@ -1,0 +1,83 @@
+## Rules of Haggis
+
+[Haggis] is a two-player trick-taking game invented by Sean Ross.
+
+[Haggis]:https://en.wikipedia.org/wiki/Haggis_(card_game)
+
+### Deck
+
+The deck consists of cards numbered 2 through 10 in each of four
+suits. The deck is shuffled, and each player is dealt 14 of these
+cards. Additionally, each player starts with three special cards
+marked J, Q, and K.
+
+### Play
+
+The first player starts with the lead. They initiate the trick by
+playing any valid card combination. The players then take turns
+playing successively higher-ranking card combinations on top of the
+last played combination (ranking rules described in detail below).
+
+A player may also pass instead of playing. In that case, the other
+player wins the trick and gains the lead for the next trick. Note that
+if a player cannot make a valid play, they must pass (but they are
+also allowed to pass even if a valid play is available).
+
+The game ends when one player runs out of cards. (They are also
+considered to have won that trick.)
+
+There are two types of valid card combinations: sequences and
+bombs. The rules for forming these combinations are described below.
+
+#### Sequences
+
+A sequence consists of consecutive blocks of numbers. The
+*multiplicity* is the size of each block, and the *length* is the
+number of blocks. The *rank* of a sequence is the highest card that
+appears in it.
+
+For example, 223344 is a sequence with multiplicity 2, length 3, and
+rank 4. Any multiplicity and length is allowed except multiplicity 1
+and length 2. **The number of suits that appear in a sequence must be
+equal to its multiplicity.**
+
+J, Q, and K have values 11, 12, and 13 for purposes of sequences. For
+example, 10JQ is a valid sequence of rank 12. J can also be played as
+a single with rank 11. Finally, J, Q, and K can also be played as wild
+cards, taking any desired suit and any desired value that is 10 or
+smaller.
+
+A sequence may only be led or played on top of another sequence with
+the exact same multiplicity and length. Furthermore, the previous
+sequence must be of a lower rank.
+
+#### Bombs
+
+Certain combinations of cards are considered "bombs". There are six
+types of bombs, listed in ascending order of ranking:
+
+- 3579 (all different suits)
+- JQ
+- JK
+- QK
+- JQK
+- 3579 (all the same suit)
+
+A bomb may be led or played on top of any sequence or on top of another bomb
+of lower ranking.
+
+### Scoring
+
+Odd-numbered cards are worth 1 point each, while J, Q, and K are worth
+2, 3, and 5 points, respectively. Even-numbered cards are not worth
+any points.
+
+Ordinarily, the winner of a trick takes all of the points in that
+trick. However, if the trick was won with a bomb, then instead the
+*opponent* takes the points.
+
+Finally, the player who finishes playing all of his/her cards first
+gains 5 points for each card remaining in their opponent's hand.
+
+Scores are accumulated over multiple rounds. The first player to reach
+350 points wins.

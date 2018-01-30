@@ -97,6 +97,40 @@ exports.prompt = (opts, cb) ->
   modal.show()
 
 
+exports.choice = (opts, cb) ->
+  # choices = list of strings
+  {choices, mesg} = opts
+  TMPL = '''<div>
+    <div class="prompt-text"></div>
+    <div class="radio-container"></div>
+    <button class="button-ok">OK</button>
+    <button class="button-cancel">Cancel</button>
+  </div>'''
+
+  elt = $ TMPL
+  modal = new Modal ($ '#game-region'), elt
+
+  elt.find('div.prompt-text').text mesg
+  radio_container = elt.find('.radio-container')
+  for choice, idx in choices
+    input_elt = $ """<div>
+      <input type=\"radio\" id=\"choice#{idx}\" name=\"radio-modal\" value=\"#{idx}\"/>
+      <label for=\"choice#{idx}\">#{choice}<\label>
+    </div>"""
+    input_elt.css {fontSize: 16}
+    radio_container.append input_elt
+
+  elt.find('button.button-ok').click =>
+    val = radio_container.find('input[name=radio-modal]:checked').val()
+    val = parseInt val
+    modal.hide()
+    cb val
+  elt.find('button.button-cancel').click =>
+    modal.hide()
+    cb null
+  modal.show()
+
+
 exports.confirm = (opts, cb) ->
   {mesg} = opts
   TMPL = '''<div>

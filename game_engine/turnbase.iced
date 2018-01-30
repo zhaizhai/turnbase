@@ -39,7 +39,7 @@ exports.select = (choices, default_choice = null) ->
 
 class GameMode
   RESERVED_FIELDS = [
-    'LEAVE_MODE', 'ENTER_MODE', 'LOG' # TODO
+    'LEAVE_MODE', 'ENTER_MODE', 'LOG', 'PLAYER', 'RANDOM'
   ]
 
   @create = (name, base, fields) ->
@@ -50,7 +50,8 @@ class GameMode
     struct_fields = {}
     actions = {}
     for k, v of fields
-      if typeof v is 'function' and not v.type?
+      # Functions starting with _ are interpreted as helper functions and not actions.
+      if typeof v is 'function' and not v.type? and k[0] isnt '_'
         actions[k] = v
       else
         struct_fields[k] = v
@@ -63,8 +64,6 @@ class GameMode
       init = fields.init
       if typeof init isnt 'function'
         throw new Error "init must be a function"
-
-    # console.log 'struct fields are', struct_fields
 
     mode_struct = struct name, struct_fields
 

@@ -1,5 +1,5 @@
 {$ajax} = require 'client/lib/http_util.iced'
-{Modal} = require 'client/lib/html_util.iced'
+{Modal} = require 'client/lib/modal.iced'
 
 window.NavBar = class NavBar
   TP = window.TEMPLATE_PARAMS
