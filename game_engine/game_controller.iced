@@ -5,6 +5,31 @@ util_m = require 'shared/util.iced'
 {V} = require 'shared/T/validation.iced'
 
 
+# XXX: Runs a function with icedcoffeescript's trampolining
+# (temporarily) disabled. This is needed to ensure contexts are
+# properly preserved when entering modes.
+with_trampolining_disabled = (ctx, fn, args...) ->
+  # The purpose of this line is to trick icedcoffeescript into
+  # compiling its runtime with this file.
+  dummy = -> await setTimeout defer(), 0
+
+  old_methods =
+    trampoline: iced.trampoline
+    _fulfill: iced.Deferrals.prototype._fulfill
+  iced.trampoline = (f) -> f()
+  # The original _fulfill uses a closure-wrapped trampoline function,
+  # so it needs to be monkey-patched as well.
+  iced.Deferrals.prototype._fulfill = (id, trace) ->
+    unless (--@count > 0)
+      return @_call(trace)
+
+  fn.call ctx, args...
+
+  # Restore the old runtime.
+  iced.trampoline = old_methods.trampoline
+  iced.Deferrals.prototype._fulfill = old_methods._fulfill
+
+
 class Operation
   constructor: (opts) ->
     DEFAULTS =
@@ -233,14 +258,7 @@ class GameController
     }
     @log.add log_entry
 
-    # XXX: Temporarily disable icedcoffeescript's trampolining. The
-    # function f is used to trick icedcoffeescript into compiling its
-    # runtime with this file.
-    f = -> await setTimeout defer(), 0
-    old_trampoline = iced.trampoline
-    iced.trampoline = (fn) -> fn()
-    @execute_block player_id, [], execute
-    iced.trampoline = old_trampoline
+    with_trampolining_disabled @, @execute_block, player_id, [], execute
 
     # TODO: slightly hacky way of snapshotting if needed
     if @log.last() is log_entry

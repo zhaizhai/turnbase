@@ -15,12 +15,13 @@ SINGLE4 = parse_hand ['C4']
 PAIR3 = parse_hand ['A3', 'B3']
 PAIR4 = parse_hand ['A4', 'B4']
 PAIR10 = parse_hand ['A10', 'B10']
-JQK_SEQUENCE = parse_hand ['J11', 'Q12', 'K13']
+#JQK_SEQUENCE = parse_hand ['J11', 'Q12', 'K13']
 ODDS = parse_hand ['B3', 'C5', 'A7', 'D9']
 ODDS_INVALID = parse_hand ['B3', 'C5', 'C7', 'D9']
 ODDS_SUITED = parse_hand ['B3', 'B5', 'B7', 'B9']
 JQ_BOMB = parse_hand ['J0', 'Q0']
 JQK_BOMB = parse_hand ['J0', 'Q0', 'K0']
+SINGLE_K = parse_hand ['K0']
 
 describe 'haggis hand logic', ->
   describe 'evaluate_hand', ->
@@ -43,9 +44,6 @@ describe 'haggis hand logic', ->
       check_eval JQ_BOMB, 'BOMB', 1
       check_eval JQK_BOMB, 'BOMB', 4
 
-    it 'correctly disambiguates when JQK is played as a sequence', ->
-      check_eval JQK_SEQUENCE, 'SEQ1:3', 11
-
   describe 'is_playable_over', ->
     it 'allows playing over with same type and higher value', ->
       expect(logic_m.is_playable_over PAIR4, PAIR3).toBe true
@@ -58,6 +56,8 @@ describe 'haggis hand logic', ->
       expect(logic_m.is_playable_over SINGLE4, null).toBe true
 
   describe 'valid_wild_values', ->
-    it 'considers both pairs and bombs', ->
+    it 'only allows all-wild hands to be played as bombs', ->
       vals = logic_m.valid_wild_values JQ_BOMB, PAIR10
-      expect(vals.length).toBe 2
+      expect(vals.length).toBe 1
+      vals = logic_m.valid_wild_values JQK_BOMB, PAIR10
+      expect(vals.length).toBe 1

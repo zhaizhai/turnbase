@@ -63,6 +63,8 @@ exports.evaluate_sequence = evaluate_sequence = (hand) ->
   for suit in FACE_SUITS
     suits.delete suit
   if suits.size > mult then return null
+  # A sequence can't be all wild cards
+  if suits.size is 0 then return null
 
   return {
     type: "SEQ#{mult}:#{len}"
@@ -115,16 +117,6 @@ exports.is_playable_over = is_playable_over = (hand, other_hand) ->
     return (other_info.type isnt 'BOMB') or (other_info.value < hand_info.value)
   return (hand_info.type is other_info.type) and (other_info.value < hand_info.value)
 
-all_value_mappings = (wilds, min_val = 2) ->
-  if wilds.length is 0 then return [[]]
-  ret = []
-  vals = [min_val..10]
-  vals.push {J: 11, Q: 12, K: 13}[wilds[0]]
-  for val in vals
-    for mapping in (all_value_mappings wilds.slice(1), val)
-      ret.push [val].concat(mapping)
-  return ret
-
 exports.display_string = display_string = (hand) ->
   hand = sorted_by_value hand
   evaluation = evaluate_hand hand
@@ -144,6 +136,16 @@ exports.display_string = display_string = (hand) ->
       ret.push ('' + card.value)
   return ret.join(' ')
 
+all_value_mappings = (wilds, min_val = 2) ->
+  if wilds.length is 0 then return [[]]
+  ret = []
+  vals = if min_val <= 10 then [min_val..10] else []
+  vals.push {J: 11, Q: 12, K: 13}[wilds[0]]
+  for val in vals
+    for mapping in (all_value_mappings wilds.slice(1), val)
+      ret.push [val].concat(mapping)
+  return ret
+
 # Given a hand, returns all legal value mappings for the face cards.
 exports.valid_wild_values = (hand, prev_hand) ->
   wilds = []
@@ -157,8 +159,9 @@ exports.valid_wild_values = (hand, prev_hand) ->
 
   possible_hand = util_m.clone hand
   ret = []
-  if hand.length is wilds.length
-    # Consider playing as a bomb.
+  if hand.length is wilds.length and wilds.length > 1
+    # If the hand is all wilds (and not a single), it must be played
+    # as a bomb.
     for c in possible_hand
       c.value = 0
     if (is_playable_over possible_hand, prev_hand)
@@ -166,6 +169,7 @@ exports.valid_wild_values = (hand, prev_hand) ->
         values: (0 for _ in possible_hand)
         display_string: display_string possible_hand
       }
+    return ret
 
   # Consider all non-bomb ways of playing the face cards.
   for mapping in (all_value_mappings wilds)

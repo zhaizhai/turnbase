@@ -122,7 +122,7 @@ Turnbase.main ->
       lead = winner
 
     @players[lead].round_points += 5 * @players[1 - lead].cards.length
-    @LOG "%{#{lead}} wins the round! (#{@players[lead].round_points()} to #{@players[1 - lead].round_points()})"
+    @LOG "%{#{lead}} wins the round! (#{@players[lead].round_points} to #{@players[1 - lead].round_points})"
 
     for player, idx in @players
       player.total_points += player.round_points
