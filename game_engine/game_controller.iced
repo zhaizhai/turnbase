@@ -1,3 +1,4 @@
+log = (require 'shared/log.iced') 'game_controller.iced'
 assert = require 'assert'
 seed_random_m = require 'seed-random'
 util_m = require 'shared/util.iced'

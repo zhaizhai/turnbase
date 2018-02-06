@@ -1,4 +1,4 @@
-log = (require 'shared/log.iced') 'states.iced'
+log = (require 'shared/log.iced') 'test.iced'
 {GameTester, define_states} = require 'game_engine/testing/game_tester.iced'
 {GameSpec} = require 'game_engine/game_spec.iced'
 
@@ -92,11 +92,11 @@ describe 'battleship game logic', ->
   it 'can detect when the game is won', (done) ->
     tester = new GameTester Battleship
     await tester.test_actions STATES.AlmostWon, defer()
-
     await tester.test_actions [
       [0, 'guess', [5, 0]]
       [1, 'guess', [3, 7]] # should be game-ending
     ], defer()
+
     # TODO: temporary hack for checking that game is over; we haven't
     # fully implemented game over behavior yet
     expect(tester.mode_name()).toBe('Main')

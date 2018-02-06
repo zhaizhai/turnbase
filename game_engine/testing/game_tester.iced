@@ -1,4 +1,4 @@
-log = (require 'shared/log.iced') 'test_game.iced'
+log = (require 'shared/log.iced') 'game_tester.iced'
 assert = require 'assert'
 synchro_m = require 'shared/synchro.iced'
 {LinearDataProvider} = require 'server/poll_server.iced'
@@ -95,9 +95,12 @@ class GameTester
       if err?
         GameClient.RPC = old_RPC
         throw err
-      # help prevent stack overflows and unexpected async behavior
-      # (real clients would necessarily have a pause here anyway)
-      await process.nextTick defer()
+
+      # XXX: Hacky way to introduce a delay so that all clients have
+      # time to clear their op queues (which are asynchronous). This
+      # might not work if there are too many ops.
+      for i in [0...10]
+        await setImmediate defer()
 
     GameClient.RPC = old_RPC
     return cb()
