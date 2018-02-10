@@ -167,8 +167,8 @@ Button = MixinClass 'Button', [CanvElement],
     @handler = opts.handler ? null
     @_onpress = opts.onpress ? null
     @_onrelease = opts.onrelease ? null
+    @_disabled = opts.disabled ? false
 
-    @_disabled = false
     @_pressed = false
     @_hover = false
 

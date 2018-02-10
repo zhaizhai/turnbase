@@ -96,7 +96,6 @@ class GameClient extends EventEmitter
   mode_name: -> @gsc.mode().name
   is_running: -> @op_stream.started
   num_players: -> @table_info.num_players()
-  player_id: -> @player_id
   username_for_player: (player_id, disambiguate = true) ->
     return @table_info.username_for_player player_id, disambiguate
 
