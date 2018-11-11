@@ -30,7 +30,7 @@ class TichuCardGraphics
   @draw_card = (ctx, card, x, y, w = @CARD_WIDTH, h = @CARD_HEIGHT) ->
     @_load_img()
 
-    for special, idx in ['dragon', 'phoenix', 'dog', 'mahjong']
+    for special, idx in ['phoenix', 'dragon', 'dog', 'mahjong']
       if card.suit is special
         card_x = 90 * (idx + 1)
         ctx.drawImage @_img, card_x, 0, 90, 126, x, y, w, h
