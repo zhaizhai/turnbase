@@ -8,6 +8,7 @@ container_m = require 'canvas/container.iced'
 modal_m = require 'client/lib/modal.iced'
 
 {TichuCardGraphics} = require 'games/tichu/tichu_card_graphics.iced'
+{CardHand, CardArranger} = require 'canvas/cards/card_hand.iced'
 logic = require 'games/tichu/tichu_logic.iced'
 
 
@@ -74,8 +75,7 @@ PassMat = MixinClass 'PassMat', [CanvElement],
 
 class PassController
   constructor: (@gc, @player_id, @root, @shared) ->
-    @_selected = null # idx of selection
-    @card_hand = null
+    @card_hand = @_arranger = null
     @pass_mat = new PassMat TichuCardGraphics
 
     tichu_button = new Button {
@@ -91,8 +91,6 @@ class PassController
       handler: =>
         to_pass = @pass_mat.get_pass()
         return if not to_pass?
-        # # TODO: pre-validate
-        to_pass = ((@card_hand.get_attrs idx).orig_index for idx in to_pass)
         await @gc.submit_action 'pass', [to_pass], defer err, res
         throw err if err
       }
@@ -104,30 +102,21 @@ class PassController
     }
     @_ctrls = new VBox {spacing: 10}, [@_tichu_status_box, tichu_button, submit]
 
-  pass_mat_handler: (idx) ->
-    existing = @pass_mat.get_occupant idx
+  pass_mat_handler: (mat_idx) ->
+    existing = @pass_mat.get_occupant mat_idx
     if existing?
-      @card_hand.set_attr existing, 'invisible', false
+      hand_idx = @_arranger.get_idx_from_orig_index existing
+      @card_hand.set_attr hand_idx, 'invisible', false
 
-    if not @_selected?
-      @pass_mat.set idx, null
+    sel = @_arranger.get_selection()
+    if not sel?
+      @pass_mat.set mat_idx, null
       return
 
-    orig_idx = (@card_hand.get_attrs @_selected).orig_index
-    card = @gc.state().players[@player_id].cards[orig_idx]
-    @card_hand.set_attr @_selected, 'invisible', true
-    @pass_mat.set idx, {card: card, idx: @_selected}
-    @deselect()
-
-  select: (idx) ->
-    @deselect()
-    @_selected = idx
-    @card_hand.set_attr @_selected, 'raised', true
-
-  deselect: ->
-    if @_selected?
-      @card_hand.set_attr @_selected, 'raised', false
-    @_selected = null
+    card = @gc.state().players[@player_id].cards[sel.orig_index]
+    @card_hand.set_attr sel.idx, 'invisible', true
+    @pass_mat.set mat_idx, {card: card, idx: sel.orig_index}
+    @card_hand.set_all 'raised', false
 
   init: ->
     passed = @gc.state().to_pass[@player_id]
@@ -138,14 +127,11 @@ class PassController
     @root.set_child 'center', @pass_mat
 
     @card_hand = @shared.ui.card_hand()
-    @card_hand.click (idx) =>
-      if idx is @_selected
-        @deselect()
-      else
-        @select idx
-    @card_hand.hover (idx) =>
-      for i in [0...@card_hand.num_cards()]
-        @card_hand.set_attr i, 'glow', (i is idx)
+    @_arranger = new CardArranger @card_hand, {
+      toggle_on_click: true,
+      multi_select: false
+    }
+    @_arranger.activate()
 
     @shared.ui.update()
     @_update_buttons()
@@ -154,7 +140,7 @@ class PassController
     @shared.ui.cleanup()
     for idx in [0...3]
       @pass_mat.set idx, null
-    @deselect()
+    @_arranger.deactivate()
 
   action: (data, cb) ->
     if data.action is 'tichu'

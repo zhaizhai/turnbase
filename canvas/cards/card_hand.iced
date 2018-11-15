@@ -276,6 +276,7 @@ class CardArranger
   constructor: (@card_hand, @opts) ->
     @opts.on_move ?= (old_idx, new_idx) ->
     @opts.toggle_on_click ?= false
+    @opts.multi_select ?= true
     @_did_move = false
     @_old_raised = null
     @_dragging_idx = null
@@ -300,6 +301,9 @@ class CardArranger
         if @opts.toggle_on_click and not @_did_move
           raised = not raised
 
+        if not @opts.multi_select
+          @card_hand.set_all 'raised', false
+
         @card_hand.set_attr @_dragging_idx, 'raised', raised
         @_reset()
     }
@@ -309,10 +313,18 @@ class CardArranger
     @_dragging_idx = null
     @_did_move = false
 
+  get_idx_from_orig_index: (orig_index) ->
+    selected = @card_hand.filter (info) -> (info.orig_index is orig_index)
+    assert selected.length > 0, "No card with original index {orig_index}"
+    assert selected.length < 2, "Found multiple cards with original index {orig_index}"
+    return selected[0].idx
+
   get_selection: ->
     selected = @card_hand.filter (info) ->
       return info.raised
-    return selected
+    if @opts.multi_select
+      return selected
+    return if selected.length == 0 then null else selected[0]
 
   activate: ->
     # TODO: allow multiple drag handlers
