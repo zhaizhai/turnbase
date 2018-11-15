@@ -175,8 +175,10 @@ class GameClient extends EventEmitter
         h.action op
 
     else if op.op in ['ENTER_MODE', 'LEAVE_MODE', 'CONTINUATION', 'GAME_OVER']
-      # TODO: double transition with LEAVE_MODE and CONTINUATION
-      @_transition @gsc.mode_name()
+      if op.op isnt 'LEAVE_MODE'
+      	# TODO: temporary hack that relies on the fact that LEAVE_MODE
+	# is immediately followed by CONTINUATION
+        @_transition @gsc.mode_name()
       if op.op is 'GAME_OVER'
         @_game_over_cleanup()
 

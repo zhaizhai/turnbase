@@ -5,6 +5,7 @@ container_m = require 'canvas/container.iced'
 
 {MixinClass} = require 'canvas/mixin.iced'
 {CanvElement} = require 'canvas/adapter.iced'
+modal_m = require 'client/lib/modal.iced'
 
 {TichuCardGraphics} = require 'games/tichu/tichu_card_graphics.iced'
 logic = require 'games/tichu/tichu_logic.iced'
@@ -155,24 +156,25 @@ class PassController
       @pass_mat.set idx, null
     @deselect()
 
-  action: (data) ->
-    if data.cmd is 'tichu'
+  action: (data, cb) ->
+    if data.action is 'tichu'
       @reset_pass()
       @_update_buttons()
-      username = @gc.username_for_player data.player_id
-      # TODO: make better UI here
-      alert "#{username} called Tichu!"
-      return
+      await modal_m.flash {
+        mesg: "#{data.username} calls Tichu!"
+        duration: 1000
+      }, defer()
+      return cb()
 
     @shared.ui.update()
     @_update_buttons()
 
     if data.player_id isnt @player_id
-      return
+      return cb()
 
     passed = @gc.state().to_pass[@player_id]
     if not passed?
-      return
+      return cb()
 
     console.log 'passed', passed
     player = @gc.state().players[@player_id]
@@ -181,6 +183,7 @@ class PassController
       @pass_mat.set i, {idx: idx, card: player.cards[idx]}
     @pass_mat.click null
     # @_submit.disable()
+    return cb()
 
   _update_buttons: ->
     tichu_level = @gc.state().players[@player_id].tichu_level

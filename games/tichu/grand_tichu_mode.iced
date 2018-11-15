@@ -46,7 +46,7 @@ class GrandTichuController
   action: (data, cb) ->
     @update()
 
-    if data.cmd is 'grand'
+    if data.action is 'grand'
       await modal_m.flash {
         mesg: "#{data.username} calls Grand Tichu!"
         duration: 1000

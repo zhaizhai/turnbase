@@ -171,7 +171,7 @@ class PlayController
     @cd.update()
 
   action: (data, cb) ->
-    if data.cmd is 'tichu'
+    if data.action is 'tichu'
       await modal_m.flash {
         mesg: "#{data.username} calls Tichu!"
         duration: 1000
