@@ -260,7 +260,10 @@ class TableRouter extends EventEmitter
       body:
         action_name: V.String
         player_id: V.Integer
-        args: (-> V.r true) # TODO: more validation
+        args: (x) ->
+          if not x instanceof Array
+            return V.r false, "args must be an array!"
+          return V.r true
     }, (req, res) =>
       {tid, action_name, player_id, args} = req.args
       table_server = @get_table tid

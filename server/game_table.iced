@@ -81,8 +81,7 @@ class GameTable
 
     for entry in entries
       entry.player_id = player_id # TODO: is this needed?
-      # TODO: better to somehow add all entries at once
-      @_poll_provider.add_data entry
+    @_poll_provider.add_data_batch entries
 
     # TODO: handle game over
     # if result.log.game_over

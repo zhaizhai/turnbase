@@ -338,21 +338,26 @@ class CardSelector
   constructor: (@card_hand, @opts = {}) ->
     @opts.multi_select ?= false
 
-    @card_hand.click (idx) =>
-      info = @card_hand.get_attrs idx
-      was_raised = (@card_hand.get_attrs idx).raised
+  _handle_click: (idx) ->
+    info = @card_hand.get_attrs idx
+    was_raised = (@card_hand.get_attrs idx).raised
 
-      if not @opts.multi_select
-        @card_hand.set_all 'raised', false
-      @card_hand.set_attr idx, 'raised', (not was_raised)
+    if not @opts.multi_select
+      @card_hand.set_all 'raised', false
+    @card_hand.set_attr idx, 'raised', (not was_raised)
 
   get_selection: ->
     selected = @card_hand.filter (info) ->
       return info.raised
-    return selected
-  # # TODO
-  # activate: ->
-  # deactivate: ->
+    if @opts.multi_select
+      return selected
+    return if selected.length == 0 then null else selected[0]
+
+  activate: ->
+    @card_hand.click (@_handle_click.bind @)
+
+  deactivate: ->
+    @card_hand.click null
 
 
 

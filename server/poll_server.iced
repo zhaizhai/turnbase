@@ -27,6 +27,13 @@ class LinearDataProvider extends PollProvider
     @_cursor++
     @emit 'cursor-changed'
 
+  add_data_batch: (items) ->
+    for item in items
+      @_data_list.push (util_m.clone item)
+      @_cursor++
+    if items.length > 0
+      @emit 'cursor-changed'
+
   get_cursor: -> @_cursor
 
   get_data: (cid, since_cursor, cb) ->

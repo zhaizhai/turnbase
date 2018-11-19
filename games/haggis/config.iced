@@ -1,5 +1,5 @@
 exports.CONFIGS =
-  display_name: 'Sweetbread'
+  display_name: 'Haggis'
   js_deps: ['&jquery']
   css_deps: []
   client: 'ui.iced'
