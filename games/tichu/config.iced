@@ -5,4 +5,4 @@ exports.CONFIGS =
   client: 'tichu_client.iced'
   default_num_players: 4
   #rules: 'rules.txt'
-  #has_bots: true
+  has_bots: true

@@ -339,6 +339,7 @@ Turnbase.mode 'Play', {
         return @LEAVE_MODE()
 
       if played[0]?.suit == 'dog'
+        @EXTRA_INFO { played_dog: true }
         # TODO: display that dog has been played?
         @_give_lead ((@last_player + 2) % 4)
 

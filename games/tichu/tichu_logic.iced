@@ -38,6 +38,12 @@ exports.points_value = points_value = (hand) ->
       ret += card.value
   return ret
 
+exports.points_value_of_trick = points_value_of_trick = (trick) ->
+    ret = 0
+    for hand in trick
+        ret += points_value(hand)
+    return ret
+
 # Sort by value then suit, with phoenix as largest suit
 exports.comparator = comparator = (a,b) ->
   if a.value == b.value
@@ -556,4 +562,3 @@ has_fh_equal = (all_info, trip, pair) ->
   useable_pairs = Math.min(2, values[pair])
 
   return useable_pairs + useable_triples + num_phx >= 5
-

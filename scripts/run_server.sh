@@ -21,7 +21,7 @@ run_bot_server() {
     iced ${ROOT_DIR}/bots/bot_server.iced $1 $2 &> ${ROOT_DIR}/logs/$1-$2.log
 }
 # run_bot_server fiverow fiverowbot &
-# run_bot_server tichu tichubot &
+run_bot_server tichu tichubot &
 # run_bot_server deduxi deduxibot &
 # run_bot_server liars_dice liarbot &
 
