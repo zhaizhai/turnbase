@@ -9,6 +9,7 @@ htsa = test_util_m.hand_to_str_arr
 {TichuRecurser, extract} = require 'bots/tichu/plan_recurse.iced'
 {PlanEvaluator} = require 'bots/tichu/plan_evaluator.iced'
 {CardCounter} = require 'bots/tichu/card_counter.iced'
+{OneVsOneEvaluator} = require 'bots/tichu/one_vs_one.iced'
 
 combinations = (n, k) ->
   if k > n
@@ -209,6 +210,44 @@ class PlayHandler
       bot_action @gc, 'play',
         [best_choice.play, best_choice.phx, null], 800
 
+  # TODO: check if we're in 1v1 mode, if so use 1v1 logic
+  # returns whether or not I'm eligible for 1v1 mode and actually played/passed here.
+  # TODO: refactor to somewhere else?
+  _consider_1v1_play: ->
+    if @gc.state().cur_turn isnt @player_id
+      return false
+
+    one_v_one = new OneVsOneEvaluator
+    cards_remaining = @card_counter.get_cards_remaining()
+
+    if not one_v_one.eligible(@gc.state(), @player_id, cards_remaining)
+      return false
+
+    console.log "considering 1v1 play", @player_id, @gc.state().players[@player_id].cards
+
+    opponent1_id = (@player_id + 1) % 4
+    opponent2_id = (@player_id + 3) % 4
+    opponent_id = if @gc.state().players[opponent1_id].is_out? then opponent2_id else opponent1_id
+
+    my_hand = @gc.state().players[@player_id].cards
+    my_points = logic.points_value(@gc.state().players[@player_id].points_taken)
+    their_hand = one_v_one.opponent_hand(my_hand, cards_remaining)
+    their_points = logic.points_value(@gc.state().players[opponent_id].points_taken)
+
+    partner_out_first = @partner_id == @gc.state().players_out()[0]
+    [_, best_choice] = one_v_one.evaluate_scenario(my_hand, their_hand, @gc.state().cur_trick, {my_points, their_points, partner_out_first} )
+
+    if best_choice.play.length is 0
+      bot_action @gc, '(1v1) pass', [], 800
+    else
+      console.log '(1v1) making play:', best_choice.play
+      console.log '(1v1) phx value:', best_choice.phx
+      console.log (cards[i] for i in best_choice.play)
+      bot_action @gc, 'play',
+        [best_choice.play, best_choice.phx, null], 800
+
+
+
   init: ->
     @_consider_play()
   action: (data) ->
@@ -216,9 +255,8 @@ class PlayHandler
       @card_counter.track_play [{suit: 'dog', value: 0}]
     @card_counter.track_play @gc.state().cur_trick.last_play()
 
-    # TODO: check if we're in 1v1 mode, if so use 1v1 logic
-
-    @_consider_play()
+    if not @_consider_1v1_play()
+      @_consider_play()
   cleanup: ->
 
 class PickDragonHandler

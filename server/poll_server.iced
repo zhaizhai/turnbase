@@ -132,7 +132,8 @@ class PollServer
   #   error, data, next_cursor, prov_id
   # }
   longpoll: (channel_req_map, timeout_ms, handler) ->
-    console.log "received longpoll on", channel_req_map
+    # TODO(joy): temporarily disable this logging while testing 1v1. undo
+    # console.log "received longpoll on", channel_req_map
 
     channel_info = {} # make copy in case channels change
     # TODO: we serve stale prov_ids... is that bad?
