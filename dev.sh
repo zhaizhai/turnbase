@@ -30,7 +30,7 @@ function setup_node_path {
 }
 setup_node_path
 
-PS1="\[\e[5;31;1m\]turnbase\[\e[0m\] $PS1"
+PS1="\[\e[1;31;1m\]turnbase\[\e[0m\] $PS1"
 export PS1
 
 unset SCRIPT_DIR
