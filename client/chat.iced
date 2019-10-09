@@ -31,11 +31,18 @@ class ChatClient
     hidden_height = chat_region[0].scrollHeight - chat_region.height()
     scrolled = chat_region.scrollTop() isnt hidden_height
 
+    old_height = chat_region.height()
     chat_region.append text_elt
+    # TODO: Hack to prevent chat element from growing larger. There
+    # should be a way with CSS but I don't know how.
+    if old_height > 0
+      # Hack to not set max-height to 0 in case element hasn't
+      # rendered yet.
+      chat_region.css 'max-height', old_height
+
     if not scrolled
       hidden_height = chat_region[0].scrollHeight - chat_region.height()
       chat_region.scrollTop hidden_height
-
 
   _make_mesg: (username, ts, mesg) ->
     now = new Date ts
