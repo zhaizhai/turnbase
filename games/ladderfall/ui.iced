@@ -36,7 +36,11 @@ make_hands = (gc) ->
   hands = []
   for player, player_id in gc.state().players
     hand_elts = [
-      new TextBox { text: (gc.username_for_player player_id), width: 100 }
+      new TextBox {
+        text: (gc.username_for_player player_id), width: 100
+        size: (if player_id is gc.state().cur_turn then 18 else 15)
+        style: (if player_id is gc.state().cur_turn then 'bold' else '')
+      }
     ]
     for card, idx in player.cards
       do (idx) =>
