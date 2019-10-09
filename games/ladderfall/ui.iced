@@ -123,6 +123,11 @@ class PlayTurnHandler
       (make_ladders @gc)
     ])
 
+    status_mesg = "Cards in deck: #{@gc.state().deck.length}, Dings: #{@gc.state().dings}"
+    @root.set_child 'bottom', (new TextBox {
+        text: status_mesg
+    })
+
   init: ->
     @_select_one = new SelectOne (
       ["P#{i}", i] for i in [0...@gc.state().players.length]

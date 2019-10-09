@@ -27,6 +27,7 @@ Turnbase.state {
   players: T.ArrayOf Player
   deck: T.ArrayOf MCard
   dings: T.Integer
+  cards_per_suit: T.Integer
   num_jokers: T.Integer
   ladders: T.ArrayOf (T.ArrayOf T.Integer)
 
@@ -40,7 +41,9 @@ Turnbase.state {
         drawn.add_access i
     player.cards.push drawn
     player.knowledge.push (new CardKnowledge {
-      known_suit: null, known_min_value: 2, known_max_value: 14
+      known_suit: null,
+      known_min_value: 2,
+      known_max_value: 1 + @cards_per_suit
     })
 
   # Adds a value to ladder, returning whether the operation was valid.
@@ -86,16 +89,33 @@ Turnbase.state {
 }
 
 Turnbase.setup {
+  options: [
+    Turnbase.option 'Num players: %{num_players}', {
+      num_players: Turnbase.select {
+        2: 2, 3: 3, 4: 4
+      }, 2
+    }
+    Turnbase.option 'Play with %{cards_per_suit} cards per suit and %{num_jokers} jokers', {
+      cards_per_suit: Turnbase.select {
+        9: 9, 10: 10, 11: 11, 12: 12, 13: 13
+      }, 13
+      num_jokers: Turnbase.select {
+        2: 2, 3: 3, 4: 4
+      }, 2
+    }
+  ]
+
   init: (initial_data) ->
-    # TODO: add values per suit option
     deck = []
     for suit in ALL_SUITS
-      for value in [2..14]
+      for value in [2..(1 + initial_data.cards_per_suit)]
         deck.push (new MCard { suit, value })
     players = for i in [0...initial_data.num_players]
       new Player { cards: [], knowledge: [] }
     return {
-      players: players, deck: deck, dings: 0, num_jokers: 2,
+      cards_per_suit: initial_data.cards_per_suit
+      num_jokers: initial_data.num_jokers
+      players: players, deck: deck, dings: 0
       ladders: [[], [], [], []]
     }
 }
