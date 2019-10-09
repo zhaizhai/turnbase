@@ -136,10 +136,12 @@ Turnbase.mode 'PlayTurn', {
       matches = []
       for card, idx in hinted_player.cards
         if card.value >= value
-          hinted_player.knowledge[idx].known_min_value = value
+          hinted_player.knowledge[idx].known_min_value = (
+            Math.max value, hinted_player.knowledge[idx].known_min_value)
           matches.push idx
         else
-          hinted_player.knowledge[idx].known_max_value = value - 1
+          hinted_player.knowledge[idx].known_max_value = (
+            Math.min (value - 1), hinted_player.knowledge[idx].known_max_value)
 
       @LOG "%{#{@PLAYER}} hints >= #{value} for %{#{player_idx}}'s hand."
       @LOG "Matches at indices #{matches}."
