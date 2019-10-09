@@ -22,7 +22,11 @@ make_ladders = (gc) ->
     suit = 'CDHS'[idx]
     ladder_cards = []
     for value in ladder
-      ladder_cards.push { suit, value }
+      if value is -1
+        # joker
+        ladder_cards.push { suit, value: 1 }
+      else
+        ladder_cards.push { suit, value }
     ladder_elts.push (new CardHand ClassicCardGraphics, {
       peek_ratio: 0.3, hand: ladder_cards
     })
@@ -37,19 +41,22 @@ make_hands = (gc) ->
     for card, idx in player.cards
       do (idx) =>
         known_suit = player.knowledge[idx].known_suit ? '?'
-        known_value = player.knowledge[idx].known_value ? '?'
+        known_min = player.knowledge[idx].known_min_value
+        known_max = player.knowledge[idx].known_max_value
+        known_range = "[#{known_min},#{known_max}]"
+
         hand_elt = if T.is_masked card
           new VBox {}, [
             new HiddenCardHand ClassicCardGraphics, { n: 1 }
             new Button {
-              text: "#{known_value}:#{known_suit}", size: 10
+              text: "#{known_range}:#{known_suit}", size: 10
               handler: => gc.submit_action 'play', [idx]
             }
           ]
         else
           new VBox {}, [
             new CardHand ClassicCardGraphics, { hand: [card] }
-            new TextBox { text: "#{known_value}:#{known_suit}", size: 10 }
+            new TextBox { text: "#{known_range}:#{known_suit}", size: 10 }
           ]
         hand_elts.push hand_elt
     hands.push (new HBox {}, hand_elts)

@@ -13,7 +13,9 @@ MCard = T.Masked Card
 
 CardKnowledge = Turnbase.struct 'CardKnowledge', {
   known_suit: T.Nullable T.String
-  known_value: T.Nullable T.Integer
+  #known_value: T.Nullable T.Integer
+  known_min_value: T.Integer
+  known_max_value: T.Integer
 }
 
 Player = Turnbase.struct 'Player', {
@@ -38,8 +40,43 @@ Turnbase.state {
         drawn.add_access i
     player.cards.push drawn
     player.knowledge.push (new CardKnowledge {
-      known_suit: null, known_value: null
+      known_suit: null, known_min_value: 2, known_max_value: 14
     })
+
+  # Adds a value to ladder, returning whether the operation was valid.
+  add_to_ladder: (ladder_idx, value) ->
+    ladder = @ladders[ladder_idx]
+    if ladder.length is 0
+      ladder.push @card.value
+      return true
+
+    if ladder[0] > @card.value
+      jokers_needed = ladder[0] - @card.value - 1
+      if jokers_needed > @num_jokers
+        return false
+      @num_jokers -= jokers_needed
+      new_ladder = [@card.value].concat (-1 for _ in [0...jokers_needed])
+      new_ladder = new_ladder.concat ladder
+      @ladders[ladder_idx] = new_ladder
+      return true
+
+    if ladder[ladder.length - 1] < @card.value
+      jokers_needed = @card.value - ladder[ladder.length - 1] - 1
+      if jokers_needed > @num_jokers
+        return false
+      @num_jokers -= jokers_needed
+      for _ in [0...jokers_needed]
+        ladder.push -1
+      ladder.push @card.value
+      return true
+
+    offset = @card.value - ladder[0]
+    if ladder[offset] is -1
+      @num_jokers += 1
+      ladder[offset] = @card.value
+      return true
+
+    return false
 
   game_is_over: ->
     for p in @players
@@ -50,6 +87,7 @@ Turnbase.state {
 
 Turnbase.setup {
   init: (initial_data) ->
+    # TODO: add values per suit option
     deck = []
     for suit in ALL_SUITS
       for value in [2..14]
@@ -57,7 +95,7 @@ Turnbase.setup {
     players = for i in [0...initial_data.num_players]
       new Player { cards: [], knowledge: [] }
     return {
-      players: players, deck: deck, dings: 0, num_jokers: 0,
+      players: players, deck: deck, dings: 0, num_jokers: 2,
       ladders: [[], [], [], []]
     }
 }
@@ -71,6 +109,7 @@ Turnbase.mode 'PlayTurn', {
       V.assert (@PLAYER is @cur_turn), "Out of turn!"
       V.assert (0 <= player_idx and player_idx < @players.length), "Invalid player id!"
       V.assert (player_idx isnt @PLAYER), "Can't hint yourself!"
+      V.assert (suit in ALL_SUITS), "Invalid suit #{suit}!"
     execute: ->
       hinted_player = @players[player_idx]
       matches = []
@@ -84,21 +123,25 @@ Turnbase.mode 'PlayTurn', {
       @dings += 1
       return @LEAVE_MODE()
 
+  # Hints everything >= value
   hint_value: (player_idx, value) ->
     types: [T.Integer, T.Integer]
     validate: ->
       V.assert (@PLAYER is @cur_turn), "Out of turn!"
       V.assert (0 <= player_idx and player_idx < @players.length), "Invalid player id!"
       V.assert (player_idx isnt @PLAYER), "Can't hint yourself!"
+      V.assert (2 <= value and value <= 14), "Value #{value} out of range!"
     execute: ->
       hinted_player = @players[player_idx]
       matches = []
       for card, idx in hinted_player.cards
-        if card.value is value
-          hinted_player.knowledge[idx].known_value = value
+        if card.value >= value
+          hinted_player.knowledge[idx].known_min_value = value
           matches.push idx
+        else
+          hinted_player.knowledge[idx].known_max_value = value - 1
 
-      @LOG "%{#{@PLAYER}} hints #{value} for %{#{player_idx}}'s hand."
+      @LOG "%{#{@PLAYER}} hints >= #{value} for %{#{player_idx}}'s hand."
       @LOG "Matches at indices #{matches}."
       @dings += 1
       return @LEAVE_MODE()
@@ -136,14 +179,8 @@ Turnbase.mode 'PlayOrDiscard', {
       for suit, idx in ALL_SUITS
         if suit isnt @card.suit
           continue
-        ladder = @ladders[idx]
-        if ladder.length is 0
-          @ladders[idx] = [@card.value]
-        else if ladder[0] is @card.value + 1
-          @ladders[idx] = [@card.value].concat ladder
-        else if ladder[ladder.length - 1] is @card.value - 1
-          ladder.push @card.value
-        else
+        was_valid = @add_to_ladder idx, @card.value
+        if not was_valid
           @LOG "This card can't be played!"
           return
       return @LEAVE_MODE()
@@ -163,7 +200,7 @@ Turnbase.main ->
   for player, player_idx in @players
     for i in [0...5]
       @draw_for_player player_idx
-  @LOG "Dealt hands"
+  @LOG "Dealt hands."
 
   cur_turn = 0
   while not @game_is_over()
