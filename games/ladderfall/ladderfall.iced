@@ -114,6 +114,7 @@ Turnbase.mode 'PlayTurn', {
       [card] = player.cards.splice card_idx, 1
       card = MCard.unmask(card)
 
+      @LOG "%{#{@PLAYER}} plays card #{card_idx}:  #{card.value}#{card.suit}."
       await @ENTER_MODE 'PlayOrDiscard', {
         card: card, cur_turn: @cur_turn
       }, defer()

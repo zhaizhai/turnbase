@@ -6,5 +6,5 @@ exports.CONFIGS =
   # If the line below is commented out, a default client will be
   # created that displays the raw game state (this is useful for
   # testing/prototyping).
-  #client: 'ui.iced'
+  client: 'ui.iced'
   default_num_players: 2
