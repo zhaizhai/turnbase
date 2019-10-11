@@ -17,4 +17,5 @@ else
 fi
 
 # TODO: verify this works on a fresh install
+# Possibly need to run mysqld first, if on OS X?
 sudo mysql -u root -f < scripts/setup_db.sql

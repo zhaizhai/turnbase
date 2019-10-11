@@ -30,6 +30,16 @@ Navigate to the project root directory. Then, run the following commands:
 npm install
 setup_dev # misc setup, including installing mysql and creating database
 games_start # starts the server
+
+# NODE_PATH=$(pwd) PATH=node_modules/.bin:/usr/bin:/Users/jeffwu/.nvm/versions/node/v7.10.1/bin TURNBASE_DEV=true nodemon --exec "$(pwd)/scripts/run_server.sh" --ext iced,coffee --ignore "bundles/*_bundle.iced"
+mkdir games/bundles
+mkdir static/compiled_js
+NODE_PATH=$(pwd) PATH=node_modules/.bin:/usr/bin:/Users/jeffwu/.nvm/versions/node/v7.10.1/bin TURNBASE_DEV=true iced ./server/index.iced
+
+sudo mysql << EOF
+ALTER USER ''@'localhost' IDENTIFIED WITH mysql_native_password BY '';
+EOF
+
 ```
 You should now be able to visit the main page by going to
 `localhost:8888` in a browser.
