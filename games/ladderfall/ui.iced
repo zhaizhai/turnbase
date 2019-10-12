@@ -96,8 +96,12 @@ class PlayTurnHandler
   constructor: (@gc, @player_id, @root) ->
 
   _make_hint_button: (hands_list_display, hint_type, hint_value) ->
+    if hint_type is 'hint_value'
+      hint_text = "|"
+    else
+      hint_text = "#{hint_value}"
     return new Button {
-      text: "#{hint_value}", width: 30, height: 30
+      text: "#{hint_text}", width: 30, height: 30
       handler: =>
         if not @_select_one.selection()? then return
         @gc.submit_action hint_type, [@_select_one.selection(), hint_value]
@@ -112,7 +116,9 @@ class PlayTurnHandler
 
     hint_value_buttons = []
     for value in [2..@gc.state().cards_per_suit]
+      hint_value_buttons.push new TextBox { text: "#{value}", size: 10 }
       hint_value_buttons.push (@_make_hint_button hands, 'hint_value', value)
+    hint_value_buttons.push new TextBox { text: "#{@gc.state().cards_per_suit + 1}", size: 10 }
 
     return new VBox {}, [
       hands,
