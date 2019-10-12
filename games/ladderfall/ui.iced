@@ -111,7 +111,7 @@ class PlayTurnHandler
       hint_suit_buttons.push (@_make_hint_button hands, 'hint_suit', suit)
 
     hint_value_buttons = []
-    for value in [2..14]
+    for value in [2..@gc.state().cards_per_suit]
       hint_value_buttons.push (@_make_hint_button hands, 'hint_value', value)
 
     return new VBox {}, [
