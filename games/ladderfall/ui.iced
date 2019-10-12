@@ -140,7 +140,7 @@ class PlayTurnHandler
 
   init: ->
     @_select_one = new SelectOne (
-      ["P#{i}", i] for i in [0...@gc.state().players.length]
+      ([(@gc.username_for_player i), i] for i in [0...@gc.state().players.length] when (i isnt @player_id))
     )
     @update()
 
