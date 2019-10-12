@@ -91,8 +91,41 @@ class SelectOne
   selection: -> @_sel
   elt: -> @_elt
 
+class PlayOrPassHandler
+  constructor: (@gc, @player_id, @root) ->
 
-class PlayTurnHandler
+  _make_play_component: ->
+    hands = make_hands @gc
+
+    return new VBox {}, [
+      hands,
+      new Button {
+        text: "Done playing", width: 50, height: 30
+        handler: => gc.submit_action 'pass', []
+      },
+    ]
+
+  update: ->
+    @root.set_child 'center', (new HBox {}, [
+      @_make_play_component()
+      (make_ladders @gc)
+    ])
+
+    status_mesg = "Cards in deck: #{@gc.state().deck.length}, Dings: #{@gc.state().dings}"
+    @root.set_child 'bottom', (new TextBox {
+        text: status_mesg
+    })
+
+  init: ->
+    @update()
+
+  action: ->
+    @update()
+
+  cleanup: -> # TODO
+
+
+class HintOrPassHandler
   constructor: (@gc, @player_id, @root) ->
 
   _make_hint_button: (hands_list_display, hint_type, hint_value) ->
@@ -125,6 +158,10 @@ class PlayTurnHandler
       @_select_one.elt(),
       (new HBox {}, hint_suit_buttons),
       (new HBox {}, hint_value_buttons),
+      new Button {
+        text: "No hint", width: 50, height: 30
+        handler: => gc.submit_action 'pass', []
+      },
     ]
 
   update: ->
@@ -195,7 +232,8 @@ Client.setup {
     }
     canv_root.add root, 10, 10
     return {
-      PlayTurn: (new PlayTurnHandler gc, player_id, root)
+      HintOrPass: (new HintOrPassHandler gc, player_id, root)
+      PlayOrPass: (new PlayOrPassHandler gc, player_id, root)
       PlayOrDiscard: (new PlayOrDiscardHandler gc, player_id, root)
     }
 }

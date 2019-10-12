@@ -29,6 +29,7 @@ Turnbase.state {
   dings: T.Integer
   cards_per_suit: T.Integer
   num_jokers: T.Integer
+  plays_this_turn: T.Integer
   ladders: T.ArrayOf (T.ArrayOf T.Integer)
 
   draw_for_player: (player_idx) ->
@@ -117,10 +118,46 @@ Turnbase.setup {
       num_jokers: initial_data.num_jokers
       players: players, deck: deck, dings: 0
       ladders: [[], [], [], []]
+      plays_this_turn: 0
     }
 }
 
-Turnbase.mode 'PlayTurn', {
+Turnbase.mode 'PlayOrPass', {
+  cur_turn: T.Integer
+
+  play: (card_idx) ->
+    types: [T.Integer]
+    validate: ->
+      V.assert (@PLAYER is @cur_turn), "Out of turn!"
+      V.assert (0 <= card_idx and card_idx < @players[@PLAYER].cards.length), "Card index out of range!"
+    execute: ->
+      player = @players[@PLAYER]
+      player.knowledge.splice card_idx, 1
+      [card] = player.cards.splice card_idx, 1
+      card = MCard.unmask(card)
+
+      @LOG "%{#{@PLAYER}} plays card #{card_idx}:  #{card.value}#{card.suit}."
+      await @ENTER_MODE 'PlayOrDiscard', {
+        card: card, cur_turn: @cur_turn
+      }, defer()
+
+      @plays_this_turn += 1
+
+  pass: () ->
+    types: []
+    validate: ->
+      V.assert (@PLAYER is @cur_turn), "Out of turn!"
+    execute: ->
+      @LOG "%{#{@PLAYER}} declines to give more hints (#{@plays_this_turn} total)."
+
+      for i in [0...@plays_this_turn]
+        if @deck.length > 0
+          @draw_for_player @PLAYER
+
+      return @LEAVE_MODE()
+}
+
+Turnbase.mode 'HintOrPass', {
   cur_turn: T.Integer
 
   hint_suit: (player_idx, suit) ->
@@ -168,24 +205,15 @@ Turnbase.mode 'PlayTurn', {
       @dings += 1
       return @LEAVE_MODE()
 
-  play: (card_idx) ->
-    types: [T.Integer]
+  pass: () ->
+    types: []
     validate: ->
       V.assert (@PLAYER is @cur_turn), "Out of turn!"
-      V.assert (0 <= card_idx and card_idx < @players[@PLAYER].cards.length), "Card index out of range!"
+      V.assert (@plays_this_turn > 0), "Must give hint if made no plays!"
+
     execute: ->
-      player = @players[@PLAYER]
-      player.knowledge.splice card_idx, 1
-      [card] = player.cards.splice card_idx, 1
-      card = MCard.unmask(card)
+      @LOG "%{#{@PLAYER}} declines to give a hint."
 
-      @LOG "%{#{@PLAYER}} plays card #{card_idx}:  #{card.value}#{card.suit}."
-      await @ENTER_MODE 'PlayOrDiscard', {
-        card: card, cur_turn: @cur_turn
-      }, defer()
-
-      if @deck.length > 0
-        @draw_for_player @PLAYER
       return @LEAVE_MODE()
 }
 
@@ -226,9 +254,13 @@ Turnbase.main ->
 
   cur_turn = 0
   while not @game_is_over()
+    @plays_this_turn = 0
     @LOG "%{#{cur_turn}}'s turn."
-    await @ENTER_MODE 'PlayTurn', {
+    await @ENTER_MODE 'PlayOrPass', {
       cur_turn: cur_turn
+    }, defer()
+    await @ENTER_MODE 'HintOrPass', {
+       cur_turn: cur_turn
     }, defer()
     cur_turn = (cur_turn + 1) % @players.length
 
