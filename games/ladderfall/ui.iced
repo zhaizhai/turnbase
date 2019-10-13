@@ -45,7 +45,7 @@ make_hands = (gc) ->
     ]
     for card, idx in player.cards
       do (idx) =>
-        known_suit = player.knowledge[idx].known_suit ? '?'
+        possible_suits = player.knowledge[idx].possible_suits.join('')
         known_min = player.knowledge[idx].known_min_value
         known_max = player.knowledge[idx].known_max_value
         known_range = "[#{known_min},#{known_max}]"
@@ -53,11 +53,11 @@ make_hands = (gc) ->
         hand_elt = if T.is_masked card
           if player_id is cur_player_id
             under_card = new Button {
-              text: "#{known_range}:#{known_suit}", size: 10
+              text: "#{known_range}\n#{possible_suits}", size: 10
               handler: => gc.submit_action 'play', [idx]
             }
           else
-            under_card = new TextBox { text: "#{known_range}:#{known_suit}", size: 10 }
+            under_card = new TextBox { text: "#{known_range}\n#{possible_suits}", size: 10 }
           new VBox {}, [
             # TODO: render this differently
             new HiddenCardHand ClassicCardGraphics, { n: 1 }
@@ -66,7 +66,7 @@ make_hands = (gc) ->
         else
           new VBox {}, [
             new CardHand ClassicCardGraphics, { hand: [card] }
-            new TextBox { text: "#{known_range}:#{known_suit}", size: 10 }
+            new TextBox { text: "#{known_range}\n#{possible_suits}", size: 10 }
           ]
         hand_elts.push hand_elt
     hands.push (new HBox {}, hand_elts)

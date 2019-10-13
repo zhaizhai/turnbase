@@ -12,7 +12,8 @@ Card = Turnbase.struct 'Card', {
 MCard = T.Masked Card
 
 CardKnowledge = Turnbase.struct 'CardKnowledge', {
-  known_suit: T.Nullable T.String
+  #known_suit: T.string
+  possible_suits: T.ArrayOf T.String
   #known_value: T.Nullable T.Integer
   known_min_value: T.Integer
   known_max_value: T.Integer
@@ -42,7 +43,7 @@ Turnbase.state {
         drawn.add_access i
     player.cards.push drawn
     player.knowledge.push (new CardKnowledge {
-      known_suit: null,
+      possible_suits: ALL_SUITS.slice(),
       known_min_value: 2,
       known_max_value: 1 + @cards_per_suit
     })
@@ -172,8 +173,10 @@ Turnbase.mode 'HintOrPass', {
       matches = []
       for card, idx in hinted_player.cards
         if card.suit is suit
-          hinted_player.knowledge[idx].known_suit = suit
+          hinted_player.knowledge[idx].possible_suits = [suit]
           matches.push idx
+        else
+          hinted_player.knowledge[idx].possible_suits = (possible_suit for possible_suit in hinted_player.knowledge[idx].possible_suits when possible_suit isnt suit)
 
       @LOG "%{#{@PLAYER}} hints #{suit} for %{#{player_idx}}'s hand."
       @LOG "Matches at indices #{matches}."
