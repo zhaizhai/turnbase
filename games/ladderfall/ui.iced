@@ -12,14 +12,19 @@ util_m = require 'shared/util.iced'
 ClassicCardGraphics = ClassicCards.get_graphics()
 
 make_ladders = (gc) ->
-  ladder_elts = []
+  ladder_elts = [
+      new TextBox {
+        text: "Ladders", width: 100, size: 18, style: 'bold'
+      }
+  ]
   for ladder, idx in gc.state().ladders
     if ladder.length is 0
+      # TODO: improve this UI
       ladder_elts.push (new HiddenCardHand ClassicCardGraphics, {
         n: 1
       })
       continue
-    suit = 'CDHS'[idx]
+    suit = gc.state().suits[idx]
     ladder_cards = []
     for value in ladder
       if value is -1
@@ -31,6 +36,29 @@ make_ladders = (gc) ->
       peek_ratio: 0.3, hand: ladder_cards
     })
   return new VBox {}, ladder_elts
+
+make_discard = (gc) ->
+  discard_elts = [
+      new TextBox {
+        text: "Discard", width: 100, size: 18, style: 'bold'
+      }
+  ]
+  for discard, idx in gc.state().discard
+    if discard.length is 0
+      # TODO: improve this UI
+      discard_elts.push (new HiddenCardHand ClassicCardGraphics, {
+        n: 1
+      })
+      continue
+    suit = gc.state().suits[idx]
+    discard_cards = []
+    for value in discard
+      discard_cards.push { suit, value }
+    discard_elts.push (new CardHand ClassicCardGraphics, {
+      peek_ratio: 0.3, hand: discard_cards
+    })
+  return new VBox {}, discard_elts
+
 
 make_hands = (gc) ->
   cur_player_id = gc.state().cur_turn
@@ -119,6 +147,7 @@ class PlayOrPassHandler
     @root.set_child 'center', (new HBox {}, [
       @_make_play_component()
       (make_ladders @gc)
+      (make_discard @gc)
     ])
 
     status_mesg = "Cards in deck: #{@gc.state().deck.length}, Dings: #{@gc.state().dings}"
@@ -158,7 +187,7 @@ class HintOrPassHandler
 
     if @player_id is gc.state().cur_turn
       hint_suit_buttons = []
-      for suit in 'CDHS'
+      for suit in gc.state().suits
         hint_suit_buttons.push (@_make_hint_button hands, 'hint_suit', suit)
 
       hint_value_buttons = []
@@ -184,6 +213,7 @@ class HintOrPassHandler
     @root.set_child 'center', (new HBox {}, [
       @_make_hint_component()
       (make_ladders @gc)
+      (make_discard @gc)
     ])
 
     status_mesg = "Cards in deck: #{@gc.state().deck.length}, Dings: #{@gc.state().dings}"
@@ -225,6 +255,7 @@ class PlayOrDiscardHandler
     @root.set_child 'center', (new HBox {}, [
       @_make_play_or_discard_choices()
       (make_ladders @gc)
+      (make_discard @gc)
     ])
 
   init: ->

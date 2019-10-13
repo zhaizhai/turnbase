@@ -31,7 +31,9 @@ Turnbase.state {
   cards_per_suit: T.Integer
   num_jokers: T.Integer
   plays_this_turn: T.Integer
+  suits: T.ArrayOf T.String
   ladders: T.ArrayOf (T.ArrayOf T.Integer)
+  discard: T.ArrayOf (T.ArrayOf T.Integer)
 
   draw_for_player: (player_idx) ->
     player = @players[player_idx]
@@ -118,7 +120,9 @@ Turnbase.setup {
       cards_per_suit: initial_data.cards_per_suit
       num_jokers: initial_data.num_jokers
       players: players, deck: deck, dings: 0
-      ladders: [[], [], [], []]
+      ladders: ([] for suit in ALL_SUITS)
+      discard: ([] for suit in ALL_SUITS)
+      suits: ALL_SUITS
       plays_this_turn: 0
     }
 }
@@ -244,6 +248,12 @@ Turnbase.mode 'PlayOrDiscard', {
       V.assert (@PLAYER is @cur_turn), "Out of turn!"
     execute: ->
       @dings += 1
+
+      for suit, idx in ALL_SUITS
+        if suit is @card.suit
+          @discard[idx].push @card.value
+          break
+
       @LOG "Discarded."
       return @LEAVE_MODE()
 }
