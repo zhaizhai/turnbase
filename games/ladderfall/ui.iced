@@ -33,6 +33,7 @@ make_ladders = (gc) ->
   return new VBox {}, ladder_elts
 
 make_hands = (gc) ->
+  cur_player_id = gc.state().cur_turn
   hands = []
   for player, player_id in gc.state().players
     hand_elts = [
@@ -50,12 +51,17 @@ make_hands = (gc) ->
         known_range = "[#{known_min},#{known_max}]"
 
         hand_elt = if T.is_masked card
-          new VBox {}, [
-            new HiddenCardHand ClassicCardGraphics, { n: 1 }
-            new Button {
+          if player_id is cur_player_id
+            under_card = new Button {
               text: "#{known_range}:#{known_suit}", size: 10
               handler: => gc.submit_action 'play', [idx]
             }
+          else
+            under_card = new TextBox { text: "#{known_range}:#{known_suit}", size: 10 }
+          new VBox {}, [
+            # TODO: render this differently
+            new HiddenCardHand ClassicCardGraphics, { n: 1 }
+            under_card
           ]
         else
           new VBox {}, [
@@ -95,15 +101,19 @@ class PlayOrPassHandler
   constructor: (@gc, @player_id, @root) ->
 
   _make_play_component: ->
-    hands = make_hands @gc
-
-    return new VBox {}, [
-      hands,
-      new Button {
+    elements = [
+      make_hands @gc
+    ]
+    if @player_id is gc.state().cur_turn
+      elements.push new Button {
         text: "Done playing", width: 50, height: 30
         handler: => gc.submit_action 'pass', []
-      },
-    ]
+      }
+    else
+      elements.push new TextBox {
+        text: "#{gc.username_for_player gc.state().cur_turn} is playing", width: 50, height: 30
+      }
+    return new VBox {}, elements
 
   update: ->
     @root.set_child 'center', (new HBox {}, [
@@ -142,27 +152,33 @@ class HintOrPassHandler
 
   _make_hint_component: ->
     hands = make_hands @gc
+    elements =  [
+      hands
+    ]
 
-    hint_suit_buttons = []
-    for suit in 'CDHS'
-      hint_suit_buttons.push (@_make_hint_button hands, 'hint_suit', suit)
+    if @player_id is gc.state().cur_turn
+      hint_suit_buttons = []
+      for suit in 'CDHS'
+        hint_suit_buttons.push (@_make_hint_button hands, 'hint_suit', suit)
 
-    hint_value_buttons = []
-    for value in [2..@gc.state().cards_per_suit]
-      hint_value_buttons.push new TextBox { text: "#{value}", size: 10 }
-      hint_value_buttons.push (@_make_hint_button hands, 'hint_value', value)
-    hint_value_buttons.push new TextBox { text: "#{@gc.state().cards_per_suit + 1}", size: 10 }
-
-    return new VBox {}, [
-      hands,
-      @_select_one.elt(),
-      (new HBox {}, hint_suit_buttons),
-      (new HBox {}, hint_value_buttons),
-      new Button {
+      hint_value_buttons = []
+      for value in [2..@gc.state().cards_per_suit]
+        hint_value_buttons.push new TextBox { text: "#{value}", size: 10 }
+        hint_value_buttons.push (@_make_hint_button hands, 'hint_value', value)
+      hint_value_buttons.push new TextBox { text: "#{@gc.state().cards_per_suit + 1}", size: 10 }
+      elements.push @_select_one.elt()
+      elements.push new HBox {}, hint_suit_buttons
+      elements.push new HBox {}, hint_value_buttons
+      elements.push new Button {
         text: "No hint", width: 50, height: 30
         handler: => gc.submit_action 'pass', []
-      },
-    ]
+      }
+    else
+      elements.push new TextBox {
+        text: "#{gc.username_for_player gc.state().cur_turn} is hinting", width: 50, height: 30
+      }
+
+    return new VBox {}, elements
 
   update: ->
     @root.set_child 'center', (new HBox {}, [
@@ -191,17 +207,19 @@ class PlayOrDiscardHandler
 
   _make_play_or_discard_choices: ->
     card = @gc.state().card
-    return new VBox {}, [
+    elements = [
       new TextBox { text: "#{card.value}:#{card.suit}" }
-      new Button {
+    ]
+    if @player_id is gc.state().cur_turn
+      elements.push new Button {
         text: 'Play'
         handler: => @gc.submit_action 'play', []
       }
-      new Button {
+      elements.push new Button {
         text: 'Discard'
         handler: => @gc.submit_action 'discard', []
       }
-    ]
+    return new VBox {}, elements
 
   update: ->
     @root.set_child 'center', (new HBox {}, [

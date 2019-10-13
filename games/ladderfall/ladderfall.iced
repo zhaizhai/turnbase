@@ -148,7 +148,7 @@ Turnbase.mode 'PlayOrPass', {
     validate: ->
       V.assert (@PLAYER is @cur_turn), "Out of turn!"
     execute: ->
-      @LOG "%{#{@PLAYER}} declines to give more hints (#{@plays_this_turn} total)."
+      @LOG "%{#{@PLAYER}} declines to play (#{@plays_this_turn} total)."
 
       for i in [0...@plays_this_turn]
         if @deck.length > 0
