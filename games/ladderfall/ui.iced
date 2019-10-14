@@ -43,7 +43,7 @@ make_discard = (gc) ->
         text: "Discard", width: 100, size: 18, style: 'bold'
       }
   ]
-  for discard, idx in gc.state().discard
+  for discard, idx in gc.state().discards
     if discard.length is 0
       # TODO: improve this UI
       discard_elts.push (new HiddenCardHand ClassicCardGraphics, {

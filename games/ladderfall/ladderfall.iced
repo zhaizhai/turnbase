@@ -33,7 +33,7 @@ Turnbase.state {
   plays_this_turn: T.Integer
   suits: T.ArrayOf T.String
   ladders: T.ArrayOf (T.ArrayOf T.Integer)
-  discard: T.ArrayOf (T.ArrayOf T.Integer)
+  discards: T.ArrayOf (T.ArrayOf T.Integer)
 
   draw_for_player: (player_idx) ->
     player = @players[player_idx]
@@ -51,30 +51,84 @@ Turnbase.state {
     })
 
   # Adds a value to ladder, returning whether the operation was valid.
-  add_to_ladder: (ladder_idx, value) ->
-    ladder = @ladders[ladder_idx]
+  add_to_ladder: (suit_idx, value) ->
+    ladder = @ladders[suit_idx]
+    discard = @discards[suit_idx]
+
+    prepend_discard_to_ladder = () =>
+      found = true
+      looking_for = @card.value - 1
+      while found
+        idx = discard.indexOf looking_for
+        if idx is -1
+          break
+        discard.splice idx, 1
+        ladder = [looking_for].concat ladder
+        looking_for -= 1
+
+    append_discard_to_ladder = () =>
+      found = true
+      looking_for = @card.value + 1
+      while found
+        idx = discard.indexOf looking_for
+        if idx is -1
+          break
+        discard.splice idx, 1
+        ladder.push looking_for
+        looking_for += 1
+
     if ladder.length is 0
       ladder.push @card.value
+      prepend_discard_to_ladder()
+      append_discard_to_ladder()
+      @ladders[suit_idx] = ladder
+      @discards[suit_idx] = discard
       return true
 
     if ladder[0] > @card.value
       jokers_needed = ladder[0] - @card.value - 1
+      for value in discard
+        if value > @card.value and ladder[0] > value
+          jokers_needed -= 1
       if jokers_needed > @num_jokers
         return false
       @num_jokers -= jokers_needed
-      new_ladder = [@card.value].concat (-1 for _ in [0...jokers_needed])
-      new_ladder = new_ladder.concat ladder
-      @ladders[ladder_idx] = new_ladder
+      val_to_add = ladder[0] - 1
+      while val_to_add > @card.value
+        idx = discard.indexOf val_to_add
+        if idx is -1
+          ladder = [-1].concat ladder
+        else
+          discard.splice idx, 1
+          ladder = [val_to_add].concat ladder
+        val_to_add -= 1
+      ladder = [@card.value].concat ladder
+      prepend_discard_to_ladder()
+      @ladders[suit_idx] = ladder
+      @discards[suit_idx] = discard
       return true
 
     if ladder[ladder.length - 1] < @card.value
       jokers_needed = @card.value - ladder[ladder.length - 1] - 1
+      for value in discard
+        if value < @card.value and ladder[0] < value
+          jokers_needed -= 1
       if jokers_needed > @num_jokers
         return false
       @num_jokers -= jokers_needed
-      for _ in [0...jokers_needed]
-        ladder.push -1
+      val_to_add = ladder[ladder.length - 1] + 1
+      while val_to_add < @card.value
+        idx = discard.indexOf val_to_add
+        if idx is -1
+          ladder.push -1
+        else
+          discard.splice idx, 1
+          ladder.push val_to_add
+        val_to_add += 1
       ladder.push @card.value
+      append_discard_to_ladder()
+      @ladders[suit_idx] = ladder
+      @discards[suit_idx] = discard
       return true
 
     offset = @card.value - ladder[0]
@@ -121,7 +175,7 @@ Turnbase.setup {
       num_jokers: initial_data.num_jokers
       players: players, deck: deck, dings: 0
       ladders: ([] for suit in ALL_SUITS)
-      discard: ([] for suit in ALL_SUITS)
+      discards: ([] for suit in ALL_SUITS)
       suits: ALL_SUITS
       plays_this_turn: 0
     }
@@ -246,12 +300,13 @@ Turnbase.mode 'PlayOrDiscard', {
     types: []
     validate: ->
       V.assert (@PLAYER is @cur_turn), "Out of turn!"
+      # TODO: disallow discard if it uses no jokers
     execute: ->
-      @dings += 1
+      @dings += 2
 
       for suit, idx in ALL_SUITS
         if suit is @card.suit
-          @discard[idx].push @card.value
+          @discards[idx].push @card.value
           break
 
       @LOG "Discarded."
