@@ -3,4 +3,4 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR=$SCRIPT_DIR/..
 
-nodemon --exec "${ROOT_DIR}/scripts/run_server.sh" --ext iced,coffee --ignore "bundles/*_bundle.iced"
+${ROOT_DIR}/node_modules/nodemon/bin/nodemon.js --exec "${ROOT_DIR}/scripts/run_server.sh" --ext iced,coffee --ignore "bundles/*_bundle.iced"
