@@ -6,6 +6,10 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR=$SCRIPT_DIR/..
 
+# Create directories used to store generated files
+mkdir -p ${ROOT_DIR}/games/bundles
+mkdir -p ${ROOT_DIR}/static/compiled_js
+
 sudo apt-get install nodejs npm
 sudo apt-get install mysql-server mysql-client
 
@@ -17,4 +21,5 @@ else
 fi
 
 # TODO: verify this works on a fresh install
+# Possibly need to run mysqld first, if on OS X?
 sudo mysql -u root -f < scripts/setup_db.sql

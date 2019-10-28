@@ -24,7 +24,7 @@ class GameStateClient
     @_state = @_mode.struct.load_json json
 
   process_op: (op_data) ->
-    log.info 'Client processing op:', op_data
+    log.info 'Client processing op:', @player_id, op_data
     {op, snapshot} = op_data
     if op in ['ENTER_MODE', 'LEAVE_MODE']
       @_mode = @game_spec.modes[op_data.mode_name]
