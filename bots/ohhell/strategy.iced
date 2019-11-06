@@ -131,10 +131,13 @@ class FivePlayerStrategy
           return @_play_under winning, @hand
 
       # We have no deficit, so try to discard highest card in shortest
-      # non-trump suit.
+      # non-trump suit that isn't ace or king.
       for suit in @card_info.suits_by_length
-        if suit isnt 'S' and @card_info[suit].length > 0
-          return util_m.last @card_info[suit]
+        if suit is 'S' then continue
+        non_ace_king = (c for c in @card_info[suit] when c.value < 13)
+        to_discard = util_m.last non_ace_king
+        if to_discard?
+          return to_discard
       # Apparently we only have trump left, just trump with highest.
       return util_m.last @hand
 
