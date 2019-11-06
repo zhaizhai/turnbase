@@ -34,3 +34,12 @@ exports.BOT_USERS =
       info:
         first_name: 'Deduxi'
         last_name: 'Bot'
+
+  ohhell:
+    hellbot:
+      port: 3004
+      username: 'HellBot'
+      password: 'hellbot'
+      info:
+        first_name: 'Hell'
+        last_name: 'Bot'

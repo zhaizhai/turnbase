@@ -2,6 +2,7 @@ assert = require 'assert'
 util_m = require 'shared/util.iced'
 Turnbase = require 'game_engine/turnbase.iced'
 {T,V} = Turnbase
+ohhell_logic_m = require 'games/ohhell/ohhell_logic.iced'
 
 ALL_SUITS = ['C', 'D', 'H', 'S']
 
@@ -20,16 +21,6 @@ Player = Turnbase.struct 'Player', {
     return util_m.all (c.suit isnt suit for c in @cards)
 }
 
-winner_idx_of_trick = (played_cards) ->
-  winner = { card: played_cards[0], idx: 0 }
-  for card, idx in played_cards
-    if card.suit is winner.card.suit
-      if card.value > winner.card.value
-        winner = { card, idx }
-    else if card.suit is 'S'
-      winner = { card, idx }
-  return winner.idx
-
 Turnbase.state {
   players: T.ArrayOf Player
   num_rounds: T.Integer
@@ -40,7 +31,7 @@ Turnbase.setup {
     Turnbase.option 'Num players: %{num_players}', {
       num_players: Turnbase.select {
         3: 3, 4: 4, 5: 5,
-      }, 3
+      }, 5
     }
   ]
 
@@ -117,7 +108,7 @@ Turnbase.mode 'PlayRound', {
       @cur_turn = (@cur_turn + 1) % @players.length
 
       if @cur_trick.length is @players.length
-        winner_offset = winner_idx_of_trick @cur_trick
+        winner_offset = ohhell_logic_m.winner_idx_of_trick @cur_trick
         winner = (@cur_turn + winner_offset) % @players.length
         return @LEAVE_MODE winner
 }
@@ -136,7 +127,14 @@ Turnbase.main ->
     @LOG "%{#{winner}} takes the trick."
     @players[winner].tricks_taken += 1
     if @players[winner].tricks_taken > @players[winner].bid
-      @LOG "You have lost: %{#{winner}} exceeded their bid!"
+      @LOG "%{#{winner}} exceeded their bid!"
     cur_turn = winner
-  @LOG "All players met their bid. You won!"
+
+  num_exceeded = 0
+  for player, idx in @players
+    if player.tricks_taken > player.bid
+      @LOG "%{#{idx}} exceeded their bid. :("
+      num_exceeded += 1
+  if num_exceeded is 0
+    @LOG "All players met their bid. You won!"
   @GAME_OVER()

@@ -24,5 +24,6 @@ run_bot_server() {
 # run_bot_server tichu tichubot &
 # run_bot_server deduxi deduxibot &
 # run_bot_server liars_dice liarbot &
+run_bot_server ohhell hellbot &
 
 iced ${ROOT_DIR}/server/index.iced
