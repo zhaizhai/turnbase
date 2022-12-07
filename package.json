@@ -13,9 +13,9 @@
     "iced-coffee-script": "^108.0.11",
     "seed-random": "^2.2.0",
     "mustache": "^2.3.x",
-    "express": "^4.16.x",
+    "express": "^4.18.x",
     "cookie-parser": "^1.4.x",
-    "body-parser": "^1.18.x",
+    "body-parser": "^1.20.x",
     "serve-static": "^1.13.x",
     "express-session": "^1.15.x",
     "fontfaceobserver": "^2.0.13"
